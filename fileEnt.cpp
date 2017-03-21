@@ -132,6 +132,18 @@ std::string fileEnt::getPermissionString() {
     case DT_DIR:
       permStr += 'd';
       break;
+    case DT_BLK:
+      permStr += 'b';
+      break;
+    case DT_CHR:
+      permStr += 'c';
+      break;
+    case DT_SOCK:
+      permStr += 's';
+      break;
+    case DT_FIFO:
+      permStr += 'p';
+      break;
     case DT_REG:
       // fallthrough
     case DT_UNKNOWN:
