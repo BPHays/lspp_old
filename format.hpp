@@ -26,11 +26,18 @@
 #define AUDIO     COLOR_ESC(LTGREY)
 #define VIDEO     COLOR_ESC(LTGREY)
 
-enum generalFormatIndex : int {fileIndex = 0, dirIndex = 1, dotfileIndex = 2};
+#define BOLD      ESC"1m"
+#define NO_EMPH   ESC"0m"
+
+#define LINK_ICON     "\uf0c1"
+#define VISIBLE_ICON  "\uf06e"
+
+enum generalFormatIndex : int {fileIndex = 0, dirIndex = 1, dotfileIndex = 2, devIndex = 3, sockIndex = 4, fifoIndex = 5};
 enum format : int {key = 0, icon = 1, color = 2};
 
 extern std::string generalFormat[][3];
 extern std::string generalFormat[][3];
 extern std::string nameFormat[][3];
+extern std::string emphasis[];
 
 #endif /* FORMAT_HPP */

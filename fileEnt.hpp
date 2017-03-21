@@ -4,6 +4,8 @@
 #include <unordered_map>
 #include <string.h>
 
+#include "format.hpp"
+
 class fileEnt {
   private:
     std::string   _path;
@@ -12,6 +14,7 @@ class fileEnt {
     const std::string * _fmt;
     struct stat   _stat;
     bool          _haveStats;
+    size_t        _nSuffixIcons;
 
   private:
     static std::unordered_map<uid_t, std::string> userNames;
@@ -32,11 +35,20 @@ class fileEnt {
     std::string   formatted(size_t length);
     const std::string & getColor();
     const std::string & getIcon();
+    const std::string & getFullName();
     std::string   getPermissionString();
     std::string & getOwnerName();
     std::string & getGroupName();
     std::string   getSize();
     std::string   getTimestamp();
+    std::string   getRefCnt(int padding = -1);
+    const char  * getEmphasis();
+    const char  * getLink();
+    const size_t & getNSuffixIcons();
+    std::string getSuffixIcons();
+    std::string getTarget();
+    bool isVisible();
+    bool isLink();
 
   private:
     void statFile();

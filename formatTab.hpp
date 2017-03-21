@@ -4,7 +4,10 @@
 std::string generalFormat[][3] = {
   {":FILE",     "",      FILE_C    },
   {":DIRECTORY","",      DIR_C     },
-  {":DOTFILE",  "",      DOTFILE   }
+  {":DOTFILE",  "",      DOTFILE   },
+  {":DEV",      "\uf0a0", DIR_C     },
+  {":SOCK",     "\uf0ee", DIR_C     },
+  {":FIFO",     "\uf0ec", DIR_C     },
 };
 
 std::string nameFormat[][3] = {
@@ -123,6 +126,7 @@ std::string extFormat[][3] = {
   {"lua",       "",      SRC       },
   {"ml",        "λ",      SRC       },
   {"mli",       "λ",      SRC       },
+  {"sml",        "λ",     SRC       },
   {"mustache",  "",      SRC       },
   {"php",       "",      SRC       },
   {"pl",        "",      SRC       },

@@ -70,6 +70,7 @@ bool lookupByExtension(fileEnt & f, std::string baseName, std::string extension)
  * @param filenames list of file entries to print
  */
 void printColumns(std::vector<fileEnt> & filenames) {
+  const size_t padding = 4;
   std::vector<size_t> colWidths;
   struct winsize w;
   ioctl(0, TIOCGWINSZ, &w);
@@ -77,6 +78,7 @@ void printColumns(std::vector<fileEnt> & filenames) {
 
   size_t rows = 0;
   size_t colWidth;
+  size_t suffixLen;
   int totalSize;
   do {
     ++rows;
@@ -88,7 +90,9 @@ void printColumns(std::vector<fileEnt> & filenames) {
         if (col * rows + row + 1 > filenames.size()) { 
           break; 
         }
-        colWidth = std::max(colWidth, filenames[col * rows + row].getName().length() + 4);
+        fileEnt & ent = filenames[col * rows + row];
+        suffixLen = ent.getNSuffixIcons() > 0 ? 2 * ent.getNSuffixIcons() : 0;
+        colWidth = std::max(colWidth, ent.getName().length() + suffixLen + padding);
       }
       colWidths.push_back(colWidth);
       totalSize += colWidth;
@@ -101,8 +105,6 @@ void printColumns(std::vector<fileEnt> & filenames) {
         if (col * rows + row + 1 > filenames.size()) { 
           break; 
         }
-        //fmt = filenames[col * rows + row].formatted(col);
-        //std::cout << fmt;
         std::cout << filenames[col * rows + row].formatted(colWidths[col] - 2);
     }
     std::cout << std::endl;
@@ -114,17 +116,23 @@ void printColumns(std::vector<fileEnt> & filenames) {
  *
  * @param f file entry to print
  */
-void printList(fileEnt & f) {
+void printList(fileEnt & f, unsigned char linkWidth) {
   // print formatting here
   // TODO implement usual ls flags to control columns
+  std::cout << f.getEmphasis();
   std::cout << f.getColor();
   std::cout << f.getPermissionString() << " ";
+  std::cout << f.getRefCnt(linkWidth) << " ";
   std::cout << f.getOwnerName() << " ";
   std::cout << f.getGroupName() << " ";
   std::cout << f.getSize() << " ";
   std::cout << f.getTimestamp() << " ";
   std::cout << f.getIcon() << " ";
-  std::cout << f.getName() << std::endl;
+  std::cout << f.getName() << f.getSuffixIcons();
+  if (f.isLink()) {
+    std::cout << " " << f.getTarget();
+  }
+  std::cout << std::endl;
 }
 
 /**
@@ -133,12 +141,13 @@ void printList(fileEnt & f) {
  * @param filenames list of file entries to print
  */
 void printList(std::vector<fileEnt> & filenames) {
-  size_t userMax = 0, groupMax = 0;
+  size_t userMax = 0, groupMax = 0, linksMax = 0;
 
   // Find correct widths
   for(fileEnt & f : filenames) {
     userMax  = std::max(f.getOwnerName().length(), userMax);
     groupMax = std::max(f.getGroupName().length(), groupMax);
+    linksMax = std::max(f.getRefCnt().length(), linksMax);
   }
 
   // Pad strings
@@ -148,7 +157,7 @@ void printList(std::vector<fileEnt> & filenames) {
 
   // Print strings
   for(fileEnt & f : filenames) {
-    printList(f);
+    printList(f, linksMax);
   }
 } 
 
@@ -174,9 +183,10 @@ int main(int argc, char **argv) {
   int  helpFlag = false;
   std::string lsdir = ".";
   char c;
-  struct option longopts[2];
+  struct option longopts[3];
   setoption(longopts[0], "all",  0, &allFlag,  (int) true);
   setoption(longopts[1], "help", 0, &helpFlag, (int) true);
+  setoption(longopts[2], NULL, 0, NULL, 0);
   int option_index = 0;
   while((c = getopt_long(argc, argv, "ahl", longopts, &option_index)) != -1) {
     switch (c) {
@@ -205,6 +215,10 @@ int main(int argc, char **argv) {
 
   struct dirent * dent;
   DIR * dir = opendir(lsdir.c_str());
+  if (dir == NULL) {
+    perror("opendir");
+    exit(-1);
+  }
   std::vector<fileEnt> filenames;
 
   // Read out all of the files
@@ -233,10 +247,23 @@ int main(int argc, char **argv) {
       ext = name.substr(index + 1);
     }
 
-    switch(f.getType()) {
-      case DT_DIR:
+    switch(f.getStat().st_mode & S_IFMT) {
+      case S_IFDIR:
         f.setFmt(generalFormat[dirIndex]);
         break;
+      case S_IFCHR:
+        /* fallthrough */
+      case S_IFBLK:
+        f.setFmt(generalFormat[devIndex]);
+        break;
+      case S_IFSOCK:
+        f.setFmt(generalFormat[sockIndex]);
+        break;
+      case S_IFIFO:
+        f.setFmt(generalFormat[fifoIndex]);
+        break;
+      case S_IFREG:
+        /* fallthrough */
       default:
         // Handle reserved Filenames
         if (lookupByFilename(f)) break;

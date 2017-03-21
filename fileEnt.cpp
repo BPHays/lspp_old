@@ -22,13 +22,35 @@ fileEnt::fileEnt(std::string dir, std::string name, unsigned char type) :
   _path(dir + "/" + name),
   _name(name),
   _type(type),
-  _haveStats(false)
-  {}
+  _haveStats(false),
+  _nSuffixIcons(0)
+  {
+    if (isLink()) {
+      ++_nSuffixIcons;
+    }
+    if (isVisible()) {
+      ++_nSuffixIcons;
+    }
+  }
 
 fileEnt::~fileEnt(){}
 
 std::string fileEnt::getName(){ return _name; }
 unsigned char fileEnt::getType(){ return _type; }
+const size_t & fileEnt::getNSuffixIcons(){ return _nSuffixIcons; }
+std::string fileEnt::getSuffixIcons() {
+  if (_nSuffixIcons == 0) {
+    return "";
+  }
+  std::string icons = "";
+  if (isLink()) {
+    icons += " " LINK_ICON;
+  }
+  if (isVisible()) {
+    icons += " " VISIBLE_ICON;
+  }
+  return icons;
+}
 
 /**
  * @brief set the format entry to use
@@ -47,7 +69,10 @@ void fileEnt::setFmt(std::string * fmt) {
  * @return the formatted string
  */
 std::string fileEnt::formatted(size_t length) {
-  return _fmt[color] + _fmt[icon] + " " + pad(_name, length);
+  std::string padding = "";
+  size_t suffixLen = getNSuffixIcons() > 0 ? 2 * getNSuffixIcons() : 0;
+  padding.resize(length - _name.length() - suffixLen, ' ');
+  return getEmphasis() + _fmt[color] + _fmt[icon] + " " + _name + getSuffixIcons() + padding;
 }
 
 /**
@@ -66,6 +91,29 @@ const std::string & fileEnt::getColor() {
  */
 const std::string & fileEnt::getIcon() {
   return _fmt[icon];
+}
+
+const char * fileEnt::getLink() {
+  if (isLink()) {
+    return  " " LINK_ICON " ";
+  } else {
+    return "";
+  }
+}
+
+bool fileEnt::isLink() {
+  struct stat lstats;
+  switch(_type) {
+    case DT_UNKNOWN:
+      // Only used for filesystems that don't support d_type in dirents
+      // Requires an extra call to stat
+      lstat(_path.c_str(), &lstats);
+      return S_ISLNK(lstats.st_mode);
+    case DT_LNK:
+      return true;
+    default:
+      return false;
+  }
 }
 
 /**
@@ -134,6 +182,22 @@ std::string & fileEnt::getGroupName() {
   return groupNames[id];
 }
 
+bool fileEnt::isVisible() {
+  if ((getStat().st_mode & 0x7) != 0) {
+    return true;
+  } else {
+    return false;
+  }
+}
+
+const char * fileEnt::getEmphasis() {
+  if (getStat().st_mode >> 6 & 0x1) {
+    return BOLD;
+  } else {
+    return NO_EMPH;
+  }
+}
+
 /**
  * @brief get a human readable file size
  *
@@ -149,9 +213,30 @@ std::string fileEnt::getSize() {
   }
   std::string str = std::to_string(size);
   while(str.length() < 4) {
-    str = " " + str;
+   str = " " + str;
   }
   return str + " " + prefix[i];
+}
+
+std::string fileEnt::getRefCnt(int padding) {
+  std::string refCnt = std::to_string(_stat.st_nlink);
+  if (padding > 0) {
+    return pad(refCnt, padding);
+  } else {
+    return refCnt;
+  }
+}
+
+std::string fileEnt::getTarget() {
+  const size_t size = 1024;
+  char targBuf[size];
+  ssize_t len;
+  if((len = readlink(_path.c_str(), targBuf, size)) > 0) {
+    targBuf[len] = '\0';
+    return std::string(targBuf);
+  } else {
+    return "";
+  }
 }
 
 /**

@@ -1,6 +1,6 @@
 CPP    		 = clang
 LIBS 			 = -lstdc++
-CPPFLAGS 	 = -std=c++14 -Werror -Wall -Wextra -W -Wpedantic
+CPPFLAGS 	 = -std=c++14 -Wall -Wextra -W -Wpedantic -Werror
 
 DEPS       = lspp.hpp format.hpp fileEnt.hpp
 OBJ 			 = lspp.o format.o fileEnt.o

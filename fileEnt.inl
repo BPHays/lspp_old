@@ -14,7 +14,7 @@ friend bool operator<(fileEnt x, fileEnt y) {
  *
  * @return a reference to the padded string
  */
-inline static std::string & pad(std::string & str, size_t length) {
+inline static std::string pad(std::string str, size_t length) {
   str.resize(length, ' ');
   return str;
 }
