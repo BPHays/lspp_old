@@ -1,7 +1,8 @@
 #ifndef FORMATTAB_HPP
 #define FORMATTAB_HPP
 
-const fileType file = {"file", NULL};
+/* fileType hiererchy */
+const fileType file =         {"file", NULL};
   const fileType srcType =      {"src",     &file};
     const fileType webDevType =   {"webdev", &srcType};
   const fileType exeType =      {"exe",     &file};
@@ -11,7 +12,9 @@ const fileType file = {"file", NULL};
   const fileType audioType =    {"audio",   &file};
   const fileType compiledType = {"comp",    &file};
   const fileType tmpType =      {"tmp",     &file};
+  const fileType rcType =       {"rc", &file};
 
+/* general format entries accessed by index from enum */
 const fileFmt generalFormat[] = {
   {":FILE",     "",      FILE_C    , &file},
   {":DIRECTORY","",      DIR_C     , &file},
@@ -22,6 +25,7 @@ const fileFmt generalFormat[] = {
   {":FIFO",     "\uf0ec", FIFO_C    , &file},
 };
 
+/* filename format entries must match full filename */
 const fileNameFmt nameFormat[] = {
   {".git",      "",      TXT, &file, false},
   {".gitignore","",      TXT, &file, false},
@@ -31,9 +35,10 @@ const fileNameFmt nameFormat[] = {
   {"license",   "",      TXT, &file, false},
   {"readme",    "",      TXT, &file, false},
   {"tags",      "",      TXT, &file, false},
-  {"\\..*rc",   "",      TXT, &file, true }
+  {"\\..*rc",   "",      TXT, &rcType, true }
 };
 
+/* extension format entries must only match the file extension */
 const fileFmt extFormat[] = {
   {"",          "",      EXE,       &exeType},
   {"exe",       "",      EXE,       &exeType},
@@ -74,7 +79,6 @@ const fileFmt extFormat[] = {
   {"ttf",       "",      TXT,       &txtType},
   {"xls",       "",      TXT,       &txtType},
   {"xlsx",      "",      TXT,       &txtType},
-  {"conf",      "",      TXT,       &txtType},
   {"csv",       "",      TXT,       &txtType},
   {"dump",      "",      TXT,       &txtType},
   {"log",       "",      TXT,       &txtType},
@@ -86,6 +90,9 @@ const fileFmt extFormat[] = {
   {"xml",       "",      TXT,       &txtType},
   {"yaml",      "",      TXT,       &txtType},
   
+  {"conf",      "",      TXT,       &rcType},
+  {"pro",       "",      TXT,       &rcType},
+
   {"lock",      "\uf023", TMP,       &tmpType},
   {"swp",       "",      TMP,       &tmpType},
   {"tmp",       "",      TMP,       &tmpType},

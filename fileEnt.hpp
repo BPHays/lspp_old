@@ -21,7 +21,7 @@ class fileEnt {
     static std::unordered_map<gid_t, std::string> groupNames;
 
   public: 
-    fileEnt(std::string dir, std::string name, unsigned char type);
+    fileEnt(std::string dir, std::string name, unsigned char type = DT_UNKNOWN);
     virtual ~fileEnt();
 
     // Getters

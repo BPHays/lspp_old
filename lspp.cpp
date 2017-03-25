@@ -69,27 +69,27 @@ bool lookupByFilename(fileEnt & f) {
  */
 bool lookupByExtension(fileEnt & f, std::string baseName, std::string extension) {
   static std::unordered_map<std::string, const fileFmt *> extCache;
+  // First try to find extension in cache
+  auto it = extCache.find(extension);
+  if (it != extCache.end()) {
+    f.setFmt(it->second);
+    return true;
+  } else {
+    // Find file extension
+    for(std::size_t i = 0; i < sizeof(extFormat)/sizeof(*extFormat); i++) {
+      const fileFmt * entry = &extFormat[i];
+      if (extension == entry->name) {
+        f.setFmt(entry);
+        extCache[extension] = &extFormat[i];
+        return true;
+      }
+    }
+  }
+
   if (baseName[0] == '.') {
     // Check if file is a dotfile
     f.setFmt(&generalFormat[dotfileIndex]);
     return true;
-  } else {
-    // First try to find extension in cache
-    auto it = extCache.find(extension);
-    if (it != extCache.end()) {
-      f.setFmt(it->second);
-      return true;
-    } else {
-      // Find file extension
-      for(std::size_t i = 0; i < sizeof(extFormat)/sizeof(*extFormat); i++) {
-        const fileFmt * entry = &extFormat[i];
-        if (extension == entry->name) {
-          f.setFmt(entry);
-          extCache[extension] = &extFormat[i];
-          return true;
-        }
-      }
-    }
   }
 
   // Use the default if extension not found
@@ -291,23 +291,26 @@ bool isChildType(const fileType * fType, std::string typeName) {
   return false;
 }
 
-void usage() {
+/**
+ * @brief Print the program's usage message
+ */
+static void usage() {
   std::cout << "Usage: lspp [al] [directory]" << std::endl;
   exit(0);
 }
 
-// Tell getopt not to print error messages for me
+// Tell getopt not to print error messages. This allows cleaner handling of
+// a getopt failure where /bin/ls is simply called
 extern int opterr = 0;
-
-void setoption(struct option & op, const char * name, int has_arg, int * flag, int val) {
-  op.name    = name;
-  op.has_arg = has_arg;
-  op.flag    = flag;
-  op.val     = val;
-}
 
 std::string listType;
 
+/**
+ * @brief Update the flagSet to match the provided flags and store any params
+ *
+ * @param argc number of command line argumnets
+ * @param argv array of the command line arguments
+ */
 void parseArgs(int argc, char ** argv) {
   short c;
   int  option_index = 0;
@@ -395,9 +398,19 @@ int main(int argc, char **argv) {
     // Sort the files
     std::sort(filenames.begin(), filenames.end());
   } else {
-    // TODO add lsing single files
-    std::cerr << "Currently cannot stat individual files" << std::endl;
-    exit(-1);
+    // TODO either need to read the directory above the file, or need
+    // to have a way to not need to use the dirent data
+    // currently lists the file and doesn't crash but metadata is garbage
+    std::size_t index = lsdir.find_last_of("/");
+    std::string name, dir;
+    if (index == std::string::npos) {
+      name = lsdir;
+      dir = "";
+    } else {
+      dir = lsdir.substr(index);
+      name = lsdir.substr(index + 1);
+    }
+    filenames.push_back(fileEnt(dir, name));
   }
 
   // Find the correct formatting settings
@@ -416,6 +429,7 @@ int main(int argc, char **argv) {
       ext = name.substr(index + 1);
     }
 
+    // Look up the format to use for each file
     switch(f.getStat().st_mode & S_IFMT) {
       case S_IFDIR:
         f.setFmt(&generalFormat[dirIndex]);
@@ -446,22 +460,22 @@ int main(int argc, char **argv) {
     }
   }
 
+  // Filter the filenames to only files with the specified fileType
   if (flagSet.test(flags::ft)) {
-    std::vector<fileEnt> filteredNames;
-    for(auto it = filenames.begin(); it != filenames.end(); ++it) {
-      // Remove any files which don't have the correct type
-      if (isChildType(it->getFileType(), listType)) {
-        filteredNames.push_back(*it);
-      }
-    }
-    filenames = filteredNames;
+    auto it = remove_if(filenames.begin(), filenames.end(),
+      [](auto f)
+        { return !isChildType(f.getFileType(), listType); });
+    filenames.erase(it, filenames.end());
   }
 
   if (flagSet.test(flags::type)) {
+    // Print each typeType together either in long list or columnar format
     printByType(filenames);
   } else if (flagSet.test(flags::longList)) {
+    // Print in long list format
     printList(filenames);
   } else {
+    // Print in compact columnar format
     printColumns(filenames);
   }
 }

@@ -35,9 +35,36 @@ fileEnt::fileEnt(std::string dir, std::string name, unsigned char type) :
 
 fileEnt::~fileEnt(){}
 
+
+/**
+ * @brief name getter
+ *
+ * @return the file's name ex file.c
+ */
 std::string fileEnt::getName(){ return _name; }
+
+
+/**
+ * @brief get the dirent type of the file
+ *
+ * @return type field from the file's dirent
+ */
 unsigned char fileEnt::getType(){ return _type; }
+
+
+/**
+ * @brief get the number of suffix icons for the file
+ *
+ * @return number of suffix icons to follow the filename
+ */
 const size_t & fileEnt::getNSuffixIcons(){ return _nSuffixIcons; }
+
+
+/**
+ * @brief get the suffix icons for the file
+ *
+ * @return a list of icons padded with a space afterward
+ */
 std::string fileEnt::getSuffixIcons() {
   if (_nSuffixIcons == 0) {
     return "";
@@ -96,6 +123,11 @@ const std::string & fileEnt::getIcon() {
   return _fmt->icon;
 }
 
+/**
+ * @brief get the fileType entry for the file
+ *
+ * @return a pointer to the fileType entry for the file
+ */
 const fileType * fileEnt::getFileType() {
   if (_fmt == NULL) {
     return NULL;
@@ -104,6 +136,11 @@ const fileType * fileEnt::getFileType() {
   }
 }
 
+/**
+ * @brief return the padded link icon if the file is a link
+ *
+ * @return the link icon or empty string depending on the filetype
+ */
 const char * fileEnt::getLink() {
   if (isLink()) {
     return  " " LINK_ICON " ";
@@ -112,6 +149,11 @@ const char * fileEnt::getLink() {
   }
 }
 
+/**
+ * @brief check if the file is a link, some FSs may require statting the file
+ *
+ * @return true if the file is a link
+ */
 bool fileEnt::isLink() {
   struct stat lstats;
   switch(_type) {
@@ -205,6 +247,11 @@ std::string & fileEnt::getGroupName() {
   return groupNames[id];
 }
 
+/**
+ * @brief check if the file has any permissions in the others columns
+ *
+ * @return true if others have any permissions for the file
+ */
 bool fileEnt::isVisible() {
   if ((getStat().st_mode & 0x7) != 0) {
     return true;
@@ -213,6 +260,11 @@ bool fileEnt::isVisible() {
   }
 }
 
+/**
+ * @brief get the empasis (bold, underline, etc) formatting for the file
+ *
+ * @return bold if the file is executable or nothing otherwise
+ */
 const char * fileEnt::getEmphasis() {
   if (getStat().st_mode >> 6 & 0x1 && _type != DT_DIR) {
     return BOLD;
@@ -241,6 +293,13 @@ std::string fileEnt::getSize() {
   return str + " " + prefix[i];
 }
 
+/**
+ * @brief get the number of hard links to the file
+ *
+ * @param padding amount to pad the string to fit nicely in a column
+ *
+ * @return the number or hard links converted to a string
+ */
 std::string fileEnt::getRefCnt(int padding) {
   std::string padStr = "";
   std::string refCnt = std::to_string(_stat.st_nlink);
@@ -251,6 +310,11 @@ std::string fileEnt::getRefCnt(int padding) {
   }
 }
 
+/**
+ * @brief get the path that a symlink points to
+ *
+ * @return a string containing the path to the symlink target
+ */
 std::string fileEnt::getTarget() {
   const size_t size = 1024;
   char targBuf[size];
