@@ -1,37 +1,38 @@
 #ifndef FORMATTAB_HPP
 #define FORMATTAB_HPP
 
+const fileType file = {"file", NULL};
+  const fileType srcType =      {"src",     &file};
+    const fileType webDevType =   {"webdev", &srcType};
+  const fileType exeType =      {"exe",     &file};
+  const fileType txtType =      {"txt",     &file};
+  const fileType archiveType =  {"arch",    &file};
+  const fileType imgType =      {"img",     &file};
+  const fileType audioType =    {"audio",   &file};
+  const fileType compiledType = {"comp",    &file};
+  const fileType tmpType =      {"tmp",     &file};
+
 const fileFmt generalFormat[] = {
-  {":FILE",     "",      FILE_C    , NULL},
-  {":DIRECTORY","",      DIR_C     , NULL},
-  {":DOTFILE",  "",      DOTFILE   , NULL},
-  {":BLK_DEV",  "\uf0a0", DEV_C     , NULL},
-  {":CHR_DEV",  "\uf1e4", DEV_C     , NULL},
-  {":SOCK",     "\uf0ee", SOCK_C    , NULL},
-  {":FIFO",     "\uf0ec", FIFO_C    , NULL},
+  {":FILE",     "",      FILE_C    , &file},
+  {":DIRECTORY","",      DIR_C     , &file},
+  {":DOTFILE",  "",      DOTFILE   , &file},
+  {":BLK_DEV",  "\uf0a0", DEV_C     , &file},
+  {":CHR_DEV",  "\uf1e4", DEV_C     , &file},
+  {":SOCK",     "\uf0ee", SOCK_C    , &file},
+  {":FIFO",     "\uf0ec", FIFO_C    , &file},
 };
 
-const fileFmt nameFormat[] = {
-  {".git",      "",      TXT, NULL},
-  {".gitignore","",      TXT, NULL},
-  {"LICENSE",   "",      TXT, NULL},
-  {"Makefile",  "",      TXT, NULL},
-  {"README",    "",      TXT, NULL},
-  {"license",   "",      TXT, NULL},
-  {"readme",    "",      TXT, NULL},
-  {"tags",      "",      TXT, NULL}
+const fileNameFmt nameFormat[] = {
+  {".git",      "",      TXT, &file, false},
+  {".gitignore","",      TXT, &file, false},
+  {"LICENSE",   "",      TXT, &file, false},
+  {"Makefile",  "",      TXT, &file, false},
+  {"README",    "",      TXT, &file, false},
+  {"license",   "",      TXT, &file, false},
+  {"readme",    "",      TXT, &file, false},
+  {"tags",      "",      TXT, &file, false},
+  {"\\..*rc",   "",      TXT, &file, true }
 };
-
-const fileType srcType =      {"src",     NULL};
-  const fileType webDevType =   {"webdev", &srcType};
-
-const fileType exeType =      {"exe",     NULL};
-const fileType txtType =      {"txt",     NULL};
-const fileType archiveType =  {"archive", NULL};
-const fileType imgType =      {"img",     NULL};
-const fileType audioType =    {"audio",   NULL};
-const fileType compiledType = {"compiled",NULL};
-const fileType tmpType =      {"tmp",     NULL};
 
 const fileFmt extFormat[] = {
   {"",          "",      EXE,       &exeType},

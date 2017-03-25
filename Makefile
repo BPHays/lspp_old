@@ -1,14 +1,20 @@
 CPP    		 = clang
 LIBS 			 = -lstdc++
-CPPFLAGS 	 = -std=c++14 -O3 -Wall -Wextra -W -Wpedantic -Werror
+CPPFLAGS 	 = -std=c++14
 
 DEPS       = lspp.hpp format.hpp fileEnt.hpp
 OBJ 			 = lspp.o format.o fileEnt.o
 
-all: lspp
+all: test
 
 debug: CPPFLAGS += -DDEBUG -g
-debug: lspp
+debug: test
+
+test: CPPFLAGS += -Wall -Wextra -W -Wpedantic -Werror
+test: lspp
+
+release: CPPFLAGS += -O3
+release: lspp
 
 lspp.o : lspp.cpp lspp.hpp format.hpp fileEnt.o formatTab.hpp
 		$(CPP) -c -o $@ $< $(CPPFLAGS)

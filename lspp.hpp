@@ -13,15 +13,16 @@ enum flags : int {
   g         = 4, 
   o         = 5, 
   ft        = 6, 
-  nFlags    = ft + 1
+  type      = 7, 
+  nFlags    = type + 1
 };
 std::bitset<nFlags> flagSet;
 
 bool lookupByFilename(fileEnt & f);
 bool lookupByExtension(fileEnt & f);
 void printColumns(std::vector<fileEnt> & filenames);
-void printList(fileEnt & f);
-void printList(std::vector<fileEnt> & filenames, unsigned char linkWidth);
+void printList(fileEnt & f, unsigned char linkWidth);
+void printList(std::vector<fileEnt> & filenames);
 void usage();
 void setoption(struct option & op, const char * name, int has_arg, int * flag, int val);
 

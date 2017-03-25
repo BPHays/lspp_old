@@ -51,8 +51,15 @@
 #define LINK_ICON     "\uf0c1"
 #define VISIBLE_ICON  "\uf06e"
 
-enum generalFormatIndex : int {fileIndex = 0, dirIndex = 1, dotfileIndex = 2, blkDevIndex = 3, chrDevIndex = 4, sockIndex = 5, fifoIndex = 6};
-enum format : int {key = 0, icon = 1, color = 2};
+enum generalFormatIndex : int {
+  fileIndex = 0, 
+  dirIndex = 1, 
+  dotfileIndex = 2, 
+  blkDevIndex = 3, 
+  chrDevIndex = 4, 
+  sockIndex = 5, 
+  fifoIndex = 6
+};
 
 struct fileType {
   std::string typeName;
@@ -64,13 +71,13 @@ struct fileFmt {
   std::string  icon;
   std::string  fmt;
   const fileType    *parent;
+  fileFmt(std::string name, std::string icon, std::string fmt, const fileType *parent) : name(name), icon(icon), fmt(fmt), parent(parent){};
 };
 
-/*
-extern const fileFmt generalFormat[];
-extern const fileFmt generalFormat[];
-extern const fileFmt nameFormat[];
-*/
+struct fileNameFmt : fileFmt {
+  bool reg;
+  fileNameFmt(std::string name, std::string icon, std::string fmt, const fileType *parent, bool reg) : fileFmt(name, icon, fmt, parent), reg(reg){};
+};
 
 extern const std::string emphasis[];
 

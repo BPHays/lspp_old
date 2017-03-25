@@ -1,8 +1,10 @@
 #include <iostream>
 #include <vector>
 #include <unordered_map>
+#include <map>
 #include <algorithm>
 #include <sstream>
+#include <regex>
 #include <chrono>
 
 #include <sys/types.h>
@@ -29,12 +31,28 @@
  * @return true if the format was set
  */
 bool lookupByFilename(fileEnt & f) {
-  std::string name = f.getName();
-  for(std::size_t i = 0; i < sizeof(nameFormat)/sizeof(*nameFormat); i++) {
-    const fileFmt * entry = &nameFormat[i];
-    if (name == entry->name) {
-      f.setFmt(entry);
-      return true;
+  static std::unordered_map<const fileNameFmt *, std::regex> regMap;
+  std::string name = f.getName(); for(std::size_t i = 0; i < sizeof(nameFormat)/sizeof(*nameFormat); i++) {
+    const fileNameFmt * entry = &nameFormat[i];
+    if (entry->reg) {
+      // Handle if the filename format is a regex
+      std::regex re;
+
+      // Use a cache to avoid recomputing regexes
+      auto it = regMap.find(entry);
+      if (it == regMap.end()) {
+        regMap[&nameFormat[i]] = std::regex(entry->name);
+      }
+      if(regex_match(name, regMap[&nameFormat[i]])) {
+        f.setFmt(entry);
+        return true;
+      }
+    } else {
+      // Handle if the filename format is simple string
+      if (name == entry->name) {
+        f.setFmt(entry);
+        return true;
+      }
     }
   }
   return false;
@@ -115,6 +133,26 @@ static inline bool fitsInNRows(
     totalSize += colWidth;
   }
   return totalSize <= width;
+}
+
+void printByType(std::vector<fileEnt> & filenames) {
+  std::map<const std::string, std::vector<fileEnt> > typeMap;
+
+  // Generate list by types
+  std::for_each(filenames.begin(), filenames.end(), 
+    [&typeMap](auto & f){
+      typeMap[f.getFileType()->typeName].push_back(f);});
+
+  // Print by type
+  for(auto & t : typeMap) {
+    std::cout << ESC "0m" << t.first << std::endl;
+    if (flagSet.test(flags::longList)) {
+      printList(t.second);
+    } else {
+      printColumns(t.second);
+    }
+    std::cout << std::endl;
+  }
 }
 
 /**
@@ -271,26 +309,34 @@ void setoption(struct option & op, const char * name, int has_arg, int * flag, i
 std::string listType;
 
 void parseArgs(int argc, char ** argv) {
-  char c;
+  short c;
   int  option_index = 0;
 
-  // gnu style long options
-  enum longOptIndex : char {ft = 0};
+  // gnu style long options 
+  // start switch indices after ascii to avoid collisions
+  enum longOptIndex : short {ft = 128, type = 129};
   struct option longopts[] = {
     {"all",             0, NULL, 'a'},
     {"allmost-aLl",     0, NULL, 'A'},
     {"help",            0, NULL, 'h'},
     {"ft",              1, NULL, ft },
+    {"type",            0, NULL, type },
     {NULL,              0, NULL, 0  }
   };
 
   // parse the args
   while((c = getopt_long(argc, argv, "aAghlo", longopts, &option_index)) != -1) {
     switch (c) {
+      // Handle long only args
       case ft:
         flagSet.set(flags::ft);
         listType = std::string(optarg);
         break;
+      case type:
+        flagSet.set(flags::type);
+        break;
+      // Handle short args, argumnets with both a long and short argument
+      // have their long argument routed to the same location as the short arg
       case 'a': flagSet.set(flags::all);        break;
       case 'A': flagSet.set(flags::almostAll);  break;
       case 'g': flagSet.set(flags::g);          break;
@@ -411,7 +457,9 @@ int main(int argc, char **argv) {
     filenames = filteredNames;
   }
 
-  if (flagSet.test(flags::longList)) {
+  if (flagSet.test(flags::type)) {
+    printByType(filenames);
+  } else if (flagSet.test(flags::longList)) {
     printList(filenames);
   } else {
     printColumns(filenames);
