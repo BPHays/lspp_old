@@ -11,7 +11,7 @@ class fileEnt {
     std::string   _path;
     std::string   _name;
     unsigned char _type;
-    const std::string * _fmt;
+    const fileFmt *_fmt;
     struct stat   _stat;
     bool          _haveStats;
     size_t        _nSuffixIcons;
@@ -29,7 +29,7 @@ class fileEnt {
     unsigned char getType();
 
     // Setters
-    void setFmt(std::string * fmt);
+    void setFmt(const fileFmt *fmt);
 
     // Methods
     std::string   formatted(size_t length);
@@ -45,6 +45,7 @@ class fileEnt {
     const char  * getEmphasis();
     const char  * getLink();
     const size_t & getNSuffixIcons();
+    const fileType * getFileType();
     std::string getSuffixIcons();
     std::string getTarget();
     bool isVisible();

@@ -4,25 +4,44 @@
 #define ESC         "\033["
 #define COLOR_ESC(c) ESC"38;5;" c "m"
 
-#define BLUE    "159"
-#define GREEN   "85"
-#define YELLOW  "229"
+#define RED     "09"
+#define GREEN   "10"
+#define YELLOW  "11"
+#define BLUE    "12"
+#define PURPLE  "13"
+#define CYAN    "14"
+
 #define LTGREY  "252"
 #define DKGREY  "244"
 #define INDIGO  "105"
 #define ORANGE  "216"
-#define RED     "160"
 
+// Generic
 #define FILE_C    COLOR_ESC(ORANGE)
-#define DIR_C     COLOR_ESC(BLUE)
+#define DIR_C     COLOR_ESC(GREEN)
+#define DEV_C     COLOR_ESC(PURPLE)
+#define SOCK_C    COLOR_ESC(PURPLE)
+#define FIFO_C    COLOR_ESC(PURPLE)
 #define DOTFILE   COLOR_ESC(INDIGO)
-#define SRC       COLOR_ESC(GREEN)
-#define EXE       COLOR_ESC(GREEN)
+
+// Bins
+#define EXE       COLOR_ESC(RED)
+
+// Code
+#define SRC       COLOR_ESC(BLUE)
+#define COMPILED  COLOR_ESC(PURPLE)
+
+// Basic Text
+#define TXT       COLOR_ESC(CYAN)
+
+// Archives
 #define COMPRESS  COLOR_ESC(YELLOW)
-#define COMPILED  COLOR_ESC(GREEN)
-#define IMG       COLOR_ESC(LTGREY)
-#define TXT       COLOR_ESC(INDIGO)
+
+// Temp
 #define TMP       COLOR_ESC(DKGREY)
+
+// Media
+#define IMG       COLOR_ESC(LTGREY)
 #define AUDIO     COLOR_ESC(LTGREY)
 #define VIDEO     COLOR_ESC(LTGREY)
 
@@ -32,12 +51,29 @@
 #define LINK_ICON     "\uf0c1"
 #define VISIBLE_ICON  "\uf06e"
 
-enum generalFormatIndex : int {fileIndex = 0, dirIndex = 1, dotfileIndex = 2, devIndex = 3, sockIndex = 4, fifoIndex = 5};
+enum generalFormatIndex : int {fileIndex = 0, dirIndex = 1, dotfileIndex = 2, blkDevIndex = 3, chrDevIndex = 4, sockIndex = 5, fifoIndex = 6};
 enum format : int {key = 0, icon = 1, color = 2};
 
-extern std::string generalFormat[][3];
-extern std::string generalFormat[][3];
-extern std::string nameFormat[][3];
-extern std::string emphasis[];
+struct fileType {
+  std::string typeName;
+  const fileType   *parent;
+};
+
+struct fileFmt {
+  std::string  name;
+  std::string  icon;
+  std::string  fmt;
+  const fileType    *parent;
+};
+
+/*
+extern const fileFmt generalFormat[];
+extern const fileFmt generalFormat[];
+extern const fileFmt nameFormat[];
+*/
+
+extern const std::string emphasis[];
+
+#include "formatTab.hpp"
 
 #endif /* FORMAT_HPP */

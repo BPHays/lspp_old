@@ -57,7 +57,7 @@ std::string fileEnt::getSuffixIcons() {
  *
  * @param fmt the format entry to use
  */
-void fileEnt::setFmt(std::string * fmt) { 
+void fileEnt::setFmt(const fileFmt *fmt) { 
   _fmt = fmt;
 }
 
@@ -71,8 +71,11 @@ void fileEnt::setFmt(std::string * fmt) {
 std::string fileEnt::formatted(size_t length) {
   std::string padding = "";
   size_t suffixLen = getNSuffixIcons() > 0 ? 2 * getNSuffixIcons() : 0;
-  padding.resize(length - _name.length() - suffixLen, ' ');
-  return getEmphasis() + _fmt[color] + _fmt[icon] + " " + _name + getSuffixIcons() + padding;
+  ssize_t padLen = length - _name.length() - suffixLen;
+  if (padLen >= 0) {
+    padding.resize(padLen, ' ');
+  }
+  return getEmphasis() + _fmt->fmt + _fmt->icon + " " + _name + getSuffixIcons() + padding;
 }
 
 /**
@@ -81,7 +84,7 @@ std::string fileEnt::formatted(size_t length) {
  * @return the entries color format field
  */
 const std::string & fileEnt::getColor() {
-  return _fmt[color];
+  return _fmt->fmt;
 }
 
 /**
@@ -90,7 +93,15 @@ const std::string & fileEnt::getColor() {
  * @return the entries icon format field
  */
 const std::string & fileEnt::getIcon() {
-  return _fmt[icon];
+  return _fmt->icon;
+}
+
+const fileType * fileEnt::getFileType() {
+  if (_fmt == NULL) {
+    return NULL;
+  } else {
+    return _fmt->parent;
+  }
 }
 
 const char * fileEnt::getLink() {
@@ -203,7 +214,7 @@ bool fileEnt::isVisible() {
 }
 
 const char * fileEnt::getEmphasis() {
-  if (getStat().st_mode >> 6 & 0x1) {
+  if (getStat().st_mode >> 6 & 0x1 && _type != DT_DIR) {
     return BOLD;
   } else {
     return NO_EMPH;
@@ -231,9 +242,10 @@ std::string fileEnt::getSize() {
 }
 
 std::string fileEnt::getRefCnt(int padding) {
+  std::string padStr = "";
   std::string refCnt = std::to_string(_stat.st_nlink);
   if (padding > 0) {
-    return pad(refCnt, padding);
+    return pad(padStr, padding - refCnt.length()) + refCnt;
   } else {
     return refCnt;
   }
@@ -257,9 +269,15 @@ std::string fileEnt::getTarget() {
  * @return human readable timestamp
  */
 std::string fileEnt::getTimestamp() {
-  char time[32];
-  //TODO handle old files by listing year instead of hh::mm
-  strftime(time, 32, "%b %d %R", localtime(&getStat().st_mtim.tv_sec));
-  return std::string(time);
+  char timeBuff[32];
+  time_t timeStamp = getStat().st_mtim.tv_sec; 
+  if((time(0) - timeStamp) < 60 * 60 * 24 * 365) {
+    // Print the time when under a year old
+    strftime(timeBuff, 32, "%b %d %R", localtime(&timeStamp));
+  } else {
+    // Print the year when over a year old
+    strftime(timeBuff, 32, "%b %d %Y ", localtime(&timeStamp));
+  }
+  return std::string(timeBuff);
 }
 
