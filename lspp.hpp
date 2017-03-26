@@ -18,12 +18,20 @@ enum flags : int {
 };
 std::bitset<nFlags> flagSet;
 
+void usage();
+std::string parseArgs(int argc, char * const * argv);
+void getFiles(const std::string lsdir, std::vector<fileEnt> & filenames);
+void getFormatStyle(std::vector<fileEnt> & filenames);
+void fileterFiles(std::vector<fileEnt> & filenames);
+void sortFiles(std::vector<fileEnt> & filenames);
+void printFiles(std::vector<fileEnt> & filenames);
+void printByType(std::vector<fileEnt> & filenames);
+
 bool lookupByFilename(fileEnt & f);
 bool lookupByExtension(fileEnt & f);
+
 void printColumns(std::vector<fileEnt> & filenames);
 void printList(fileEnt & f, unsigned char linkWidth);
 void printList(std::vector<fileEnt> & filenames);
-void usage();
-void setoption(struct option & op, const char * name, int has_arg, int * flag, int val);
 
 #endif /* LSPP_HPP */

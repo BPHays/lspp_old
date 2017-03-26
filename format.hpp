@@ -61,17 +61,35 @@ enum generalFormatIndex : int {
   fifoIndex = 6
 };
 
-struct fileType {
+// TODO generalize fileType and fileFmt structs to use format
+// this allows setting a fileType default format to use, to reduce
+// duplication
+/*
+struct format {
+  std::string icon;
+  std::string fmt;
+};
+*/
+
+struct fileType /*: format*/ {
   std::string typeName;
   const fileType   *parent;
+  /*
+  const format * format;
+  fileType(std::string name, const fileType * parent, std::string icon = "", std::string fmt = "") : format(icon, fmt), name(name), parent(parent){};
+  */
 };
 
-struct fileFmt {
+struct fileFmt /*: format*/ {
   std::string  name;
   std::string  icon;
   std::string  fmt;
   const fileType    *parent;
   fileFmt(std::string name, std::string icon, std::string fmt, const fileType *parent) : name(name), icon(icon), fmt(fmt), parent(parent){};
+  /*
+  const format * format;
+  fileFmt(std::string name, std::string icon, std::string fmt, const fileType *parent) : format(icon, fmt), name(name), icon(icon), fmt(fmt), parent(parent){};
+  */
 };
 
 struct fileNameFmt : fileFmt {

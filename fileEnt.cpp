@@ -22,9 +22,11 @@ fileEnt::fileEnt(std::string dir, std::string name, unsigned char type) :
   _path(dir + "/" + name),
   _name(name),
   _type(type),
-  _haveStats(false),
   _nSuffixIcons(0)
   {
+    if (stat(_path.c_str(), &_stat) < 0) {
+      perror("");
+    };
     if (isLink()) {
       ++_nSuffixIcons;
     }
@@ -35,13 +37,12 @@ fileEnt::fileEnt(std::string dir, std::string name, unsigned char type) :
 
 fileEnt::~fileEnt(){}
 
-
 /**
  * @brief name getter
  *
  * @return the file's name ex file.c
  */
-std::string fileEnt::getName(){ return _name; }
+std::string fileEnt::getName() const { return _name; }
 
 
 /**
@@ -49,7 +50,7 @@ std::string fileEnt::getName(){ return _name; }
  *
  * @return type field from the file's dirent
  */
-unsigned char fileEnt::getType(){ return _type; }
+unsigned char fileEnt::getType() const { return _type; }
 
 
 /**
@@ -57,7 +58,7 @@ unsigned char fileEnt::getType(){ return _type; }
  *
  * @return number of suffix icons to follow the filename
  */
-const size_t & fileEnt::getNSuffixIcons(){ return _nSuffixIcons; }
+const size_t & fileEnt::getNSuffixIcons() const { return _nSuffixIcons; }
 
 
 /**
@@ -65,7 +66,7 @@ const size_t & fileEnt::getNSuffixIcons(){ return _nSuffixIcons; }
  *
  * @return a list of icons padded with a space afterward
  */
-std::string fileEnt::getSuffixIcons() {
+std::string fileEnt::getSuffixIcons() const {
   if (_nSuffixIcons == 0) {
     return "";
   }
@@ -95,7 +96,7 @@ void fileEnt::setFmt(const fileFmt *fmt) {
  *
  * @return the formatted string
  */
-std::string fileEnt::formatted(size_t length) {
+std::string fileEnt::formatted(size_t length) const {
   std::string padding = "";
   size_t suffixLen = getNSuffixIcons() > 0 ? 2 * getNSuffixIcons() : 0;
   ssize_t padLen = length - _name.length() - suffixLen;
@@ -110,7 +111,7 @@ std::string fileEnt::formatted(size_t length) {
  *
  * @return the entries color format field
  */
-const std::string & fileEnt::getColor() {
+const std::string & fileEnt::getColor() const {
   return _fmt->fmt;
 }
 
@@ -119,7 +120,7 @@ const std::string & fileEnt::getColor() {
  *
  * @return the entries icon format field
  */
-const std::string & fileEnt::getIcon() {
+const std::string & fileEnt::getIcon() const {
   return _fmt->icon;
 }
 
@@ -128,7 +129,7 @@ const std::string & fileEnt::getIcon() {
  *
  * @return a pointer to the fileType entry for the file
  */
-const fileType * fileEnt::getFileType() {
+const fileType * fileEnt::getFileType() const {
   if (_fmt == NULL) {
     return NULL;
   } else {
@@ -141,7 +142,7 @@ const fileType * fileEnt::getFileType() {
  *
  * @return the link icon or empty string depending on the filetype
  */
-const char * fileEnt::getLink() {
+const char * fileEnt::getLink() const {
   if (isLink()) {
     return  " " LINK_ICON " ";
   } else {
@@ -154,7 +155,7 @@ const char * fileEnt::getLink() {
  *
  * @return true if the file is a link
  */
-bool fileEnt::isLink() {
+bool fileEnt::isLink() const {
   struct stat lstats;
   switch(_type) {
     case DT_UNKNOWN:
@@ -174,7 +175,7 @@ bool fileEnt::isLink() {
  *
  * @return human readable permissions bits string
  */
-std::string fileEnt::getPermissionString() {
+std::string fileEnt::getPermissionString() const {
   std::string permStr = "";
 
   // Set the type char
@@ -226,7 +227,7 @@ std::string fileEnt::getPermissionString() {
  *
  * @return the file owner's name
  */
-std::string & fileEnt::getOwnerName() {
+std::string & fileEnt::getOwnerName() const {
   uid_t id = getStat().st_uid;
   if (userNames.find(id) == userNames.end()) {
     userNames[id] = std::string(getpwuid(getStat().st_uid)->pw_name);
@@ -239,7 +240,7 @@ std::string & fileEnt::getOwnerName() {
  *
  * @return the file's group name
  */
-std::string & fileEnt::getGroupName() {
+std::string & fileEnt::getGroupName() const {
   gid_t id = getStat().st_gid;
   if (groupNames.find(id) == groupNames.end()) {
     groupNames[id] = std::string(getgrgid(id)->gr_name);
@@ -252,7 +253,7 @@ std::string & fileEnt::getGroupName() {
  *
  * @return true if others have any permissions for the file
  */
-bool fileEnt::isVisible() {
+bool fileEnt::isVisible() const {
   if ((getStat().st_mode & 0x7) != 0) {
     return true;
   } else {
@@ -265,7 +266,7 @@ bool fileEnt::isVisible() {
  *
  * @return bold if the file is executable or nothing otherwise
  */
-const char * fileEnt::getEmphasis() {
+const char * fileEnt::getEmphasis() const {
   if (getStat().st_mode >> 6 & 0x1 && _type != DT_DIR) {
     return BOLD;
   } else {
@@ -278,7 +279,7 @@ const char * fileEnt::getEmphasis() {
  *
  * @return padded human readable file size
  */
-std::string fileEnt::getSize() {
+std::string fileEnt::getSize() const {
   const char *prefix[] = {"  B", "KiB", "MiB", "GiB", "TiB"};
   off_t size = getStat().st_size;
   size_t i = 0;
@@ -300,7 +301,7 @@ std::string fileEnt::getSize() {
  *
  * @return the number or hard links converted to a string
  */
-std::string fileEnt::getRefCnt(int padding) {
+std::string fileEnt::getRefCnt(int padding) const {
   std::string padStr = "";
   std::string refCnt = std::to_string(_stat.st_nlink);
   if (padding > 0) {
@@ -315,7 +316,7 @@ std::string fileEnt::getRefCnt(int padding) {
  *
  * @return a string containing the path to the symlink target
  */
-std::string fileEnt::getTarget() {
+std::string fileEnt::getTarget() const {
   const size_t size = 1024;
   char targBuf[size];
   ssize_t len;
@@ -332,7 +333,7 @@ std::string fileEnt::getTarget() {
  *
  * @return human readable timestamp
  */
-std::string fileEnt::getTimestamp() {
+std::string fileEnt::getTimestamp() const {
   char timeBuff[32];
   time_t timeStamp = getStat().st_mtim.tv_sec; 
   if((time(0) - timeStamp) < 60 * 60 * 24 * 365) {

@@ -46,10 +46,6 @@ inline static void padUserNames(size_t length) {
  *
  * @return the file entry's stat struct from the stat syscall
  */
-inline const struct stat & getStat() {
-  if (!_haveStats) {
-    stat(_path.c_str(), &_stat);
-    _haveStats = true;
-  }
+inline const struct stat & getStat() const {
   return _stat;
 }

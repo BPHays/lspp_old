@@ -13,11 +13,12 @@ const fileType file =         {"file", NULL};
   const fileType compiledType = {"comp",    &file};
   const fileType tmpType =      {"tmp",     &file};
   const fileType rcType =       {"rc", &file};
+  const fileType dir =        {"dir", NULL};
 
 /* general format entries accessed by index from enum */
 const fileFmt generalFormat[] = {
   {":FILE",     "",      FILE_C    , &file},
-  {":DIRECTORY","",      DIR_C     , &file},
+  {":DIRECTORY","",      DIR_C     , &dir},
   {":DOTFILE",  "",      DOTFILE   , &file},
   {":BLK_DEV",  "\uf0a0", DEV_C     , &file},
   {":CHR_DEV",  "\uf1e4", DEV_C     , &file},

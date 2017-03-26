@@ -32,7 +32,8 @@
  */
 bool lookupByFilename(fileEnt & f) {
   static std::unordered_map<const fileNameFmt *, std::regex> regMap;
-  std::string name = f.getName(); for(std::size_t i = 0; i < sizeof(nameFormat)/sizeof(*nameFormat); i++) {
+  std::string name = f.getName(); 
+  for(std::size_t i = 0; i < sizeof(nameFormat)/sizeof(*nameFormat); i++) {
     const fileNameFmt * entry = &nameFormat[i];
     if (entry->reg) {
       // Handle if the filename format is a regex
@@ -146,11 +147,7 @@ void printByType(std::vector<fileEnt> & filenames) {
   // Print by type
   for(auto & t : typeMap) {
     std::cout << ESC "0m" << t.first << std::endl;
-    if (flagSet.test(flags::longList)) {
-      printList(t.second);
-    } else {
-      printColumns(t.second);
-    }
+    printFiles(t.second);
     std::cout << std::endl;
   }
 }
@@ -294,7 +291,7 @@ bool isChildType(const fileType * fType, std::string typeName) {
 /**
  * @brief Print the program's usage message
  */
-static void usage() {
+void usage() {
   std::cout << "Usage: lspp [al] [directory]" << std::endl;
   exit(0);
 }
@@ -310,8 +307,10 @@ std::string listType;
  *
  * @param argc number of command line argumnets
  * @param argv array of the command line arguments
+ *
+ * @return std::string the directory to list
  */
-void parseArgs(int argc, char ** argv) {
+std::string parseArgs(int argc, char * const * argv) {
   short c;
   int  option_index = 0;
 
@@ -349,24 +348,22 @@ void parseArgs(int argc, char ** argv) {
       default:  execvp("ls", argv);
     }
   }
+
+  // Get directory to list or use "." if none provided
+  if (optind < argc) {
+    return std::string(argv[optind]); 
+  } else {
+    return ".";
+  }
 }
 
-int main(int argc, char **argv) {
-  std::vector<fileEnt> filenames;
-  std::string lsdir = ".";
-
-  std::cout.sync_with_stdio(false);
-  std::setvbuf(stdout, NULL, _IOFBF, 8192);
-
-  parseArgs(argc, argv);
-
-  if (flagSet.test(flags::help)) {
-    usage();
-  }
-
-  if (optind < argc) {
-    lsdir = std::string(argv[optind]); }
-
+/**
+ * @brief open dir and read in the list of files or the file is dir is a file
+ *
+ * @param dir the directory to open, may be a regular file as well
+ * @param filenames a list to populate with the filenames
+ */
+void getFiles(const std::string lsdir, std::vector<fileEnt> & filenames) {
   // Check if a directory or a file
   struct stat stats;
   if (stat(lsdir.c_str(), &stats) < 0) {
@@ -395,24 +392,24 @@ int main(int argc, char **argv) {
       }
     }
     
-    // Sort the files
-    std::sort(filenames.begin(), filenames.end());
   } else {
     // TODO either need to read the directory above the file, or need
     // to have a way to not need to use the dirent data
     // currently lists the file and doesn't crash but metadata is garbage
     std::size_t index = lsdir.find_last_of("/");
-    std::string name, dir;
+    std::string name, lsdir;
     if (index == std::string::npos) {
       name = lsdir;
-      dir = "";
+      lsdir = "";
     } else {
-      dir = lsdir.substr(index);
+      lsdir = lsdir.substr(index);
       name = lsdir.substr(index + 1);
     }
-    filenames.push_back(fileEnt(dir, name));
+    filenames.push_back(fileEnt(lsdir, name));
   }
+}
 
+void getFormatStyle(std::vector<fileEnt> & filenames) {
   // Find the correct formatting settings
   for(fileEnt & f : filenames) {
     std::string name = f.getName();
@@ -459,23 +456,68 @@ int main(int argc, char **argv) {
         assert(0);
     }
   }
+}
 
-  // Filter the filenames to only files with the specified fileType
-  if (flagSet.test(flags::ft)) {
-    auto it = remove_if(filenames.begin(), filenames.end(),
-      [](auto f)
-        { return !isChildType(f.getFileType(), listType); });
-    filenames.erase(it, filenames.end());
-  }
+void filterFiles(std::vector<fileEnt> & filenames) {
+  auto it = remove_if(filenames.begin(), filenames.end(),
+    [](auto f)
+      { return !isChildType(f.getFileType(), listType); });
+  filenames.erase(it, filenames.end());
+}
 
-  if (flagSet.test(flags::type)) {
-    // Print each typeType together either in long list or columnar format
-    printByType(filenames);
-  } else if (flagSet.test(flags::longList)) {
+void sortFiles(std::vector<fileEnt> & filenames) {
+  // TODO add other sorting functions for the other sort flags
+  auto sortBy = [](auto const & x, auto const & y) {
+    const char * xc = x.getName().c_str();
+    const char * yc = y.getName().c_str();
+    if (*xc == '.') ++xc;
+    if (*yc == '.') ++yc;
+    return strcasecmp(xc, yc) < 0;
+  };
+
+  std::sort(filenames.begin(), filenames.end(), sortBy);
+}
+
+void printFiles(std::vector<fileEnt> & filenames) {
+  if (flagSet.test(flags::longList)) {
     // Print in long list format
     printList(filenames);
   } else {
     // Print in compact columnar format
     printColumns(filenames);
+  }
+}
+
+int main(int argc, char **argv) {
+  std::vector<fileEnt>  filenames;
+  std::string           lsdir;
+
+  std::cout.sync_with_stdio(false);
+  std::setvbuf(stdout, NULL, _IOFBF, 8192);
+
+  // Parse the command line flags and get the directory to list
+  lsdir = parseArgs(argc, argv);
+
+  // Print the usage message and exit if the help flag was set
+  if (flagSet.test(flags::help)) { usage(); }
+
+  // get all of the files in the directory
+  getFiles(lsdir, filenames);
+
+  // look up the correct format for each file
+  getFormatStyle(filenames);
+
+  // Filter the filenames to only files with the specified fileType
+  if (flagSet.test(flags::ft)) { filterFiles(filenames); }
+
+  // Sort the files
+  sortFiles(filenames);
+
+  if (flagSet.test(flags::type)) { 
+    // Print each typeType together either in long list or columnar format
+    printByType(filenames); 
+  } else {
+    // Print the files normally
+    printFiles(filenames);
   }
 }
