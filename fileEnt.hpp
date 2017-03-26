@@ -34,14 +34,16 @@ class fileEnt {
     const std::string & getIcon()                     const;
           std::string   getName()                     const;
     const size_t      & getNSuffixIcons()             const;
+          time_t        getModTS()                    const;
+          off_t         getSize()                     const;
 
     // Other getters
           std::string   formatted(size_t length)      const;
           std::string   getPermissionString()         const;
           std::string & getOwnerName()                const;
           std::string & getGroupName()                const;
-          std::string   getSize()                     const;
-          std::string   getTimestamp()                const;
+          std::string   getSizeStr()                  const;
+          std::string   getTimestampStr()             const;
           std::string   getRefCnt(int padding = -1)   const;
           std::string   getSuffixIcons()              const;
           std::string   getTarget()                   const;

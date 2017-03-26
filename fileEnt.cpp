@@ -279,7 +279,7 @@ const char * fileEnt::getEmphasis() const {
  *
  * @return padded human readable file size
  */
-std::string fileEnt::getSize() const {
+std::string fileEnt::getSizeStr() const {
   const char *prefix[] = {"  B", "KiB", "MiB", "GiB", "TiB"};
   off_t size = getStat().st_size;
   size_t i = 0;
@@ -292,6 +292,10 @@ std::string fileEnt::getSize() const {
    str = " " + str;
   }
   return str + " " + prefix[i];
+}
+
+off_t fileEnt::getSize() const {
+  return getStat().st_size;
 }
 
 /**
@@ -333,7 +337,7 @@ std::string fileEnt::getTarget() const {
  *
  * @return human readable timestamp
  */
-std::string fileEnt::getTimestamp() const {
+std::string fileEnt::getTimestampStr() const {
   char timeBuff[32];
   time_t timeStamp = getStat().st_mtim.tv_sec; 
   if((time(0) - timeStamp) < 60 * 60 * 24 * 365) {
@@ -344,5 +348,9 @@ std::string fileEnt::getTimestamp() const {
     strftime(timeBuff, 32, "%b %d %Y ", localtime(&timeStamp));
   }
   return std::string(timeBuff);
+}
+
+time_t fileEnt::getModTS() const {
+  return getStat().st_mtim.tv_sec;
 }
 
