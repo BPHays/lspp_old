@@ -153,6 +153,20 @@ void printByType(std::vector<fileEnt> & filenames) {
   }
 }
 
+static void printFormatColumn(fileEnt & f, size_t length) {
+  std::string padding = "";
+  size_t suffixLen = f.getNSuffixIcons() > 0 ? 2 * f.getNSuffixIcons() : 0;
+  ssize_t padLen = length - f.getName().length() - suffixLen;
+  if (padLen >= 0) {
+    padding.resize(padLen, ' ');
+  }
+  if (args.getFlag(argSet::flags::color)) {
+    std::cout << f.getColor();
+  }
+  std::cout << f.getIcon() << " ";
+  std::cout << f.getName() << f.getSuffixIcons() << padding;
+}
+
 /**
  * @brief print the list of file entries in right sized columns
  *
@@ -207,11 +221,11 @@ void printColumns(std::vector<fileEnt> & filenames) {
           break; 
         }
         if ((col + 1) * rows + row < filenames.size()) {
-          std::cout << filenames[col * rows + row].formatted(colWidths[col] - 2);
-          //ss << filenames[col * rows + row].formatted(colWidths[col] - 2);
+          //std::cout << filenames[col * rows + row].formatted(colWidths[col] - 2);
+          printFormatColumn(filenames[col * rows + row], colWidths[col] - 2);
         } else {
-          std::cout << filenames[col * rows + row].formatted(0);
-          //ss << filenames[col * rows + row].formatted(0);
+          //std::cout << filenames[col * rows + row].formatted(0);
+          printFormatColumn(filenames[col * rows + row], 0);
         }
     }
     std::cout << std::endl;
@@ -226,19 +240,19 @@ void printColumns(std::vector<fileEnt> & filenames) {
 void printLongList(fileEnt & f, unsigned char linkWidth) {
   // print formatting here
   // TODO implement usual ls flags to control columns
-  if (!flagSet.test(flags::noFmt)) {
+  if (!args.getFlag(argSet::flags::noFmt)) {
     std::cout << f.getEmphasis();
     std::cout << f.getColor();
   }
   std::cout << f.getPermissionString() << " ";
   std::cout << f.getRefCnt(linkWidth) << " ";
-  if (!flagSet.test(flags::noOwner)) {
+  if (!args.getFlag(argSet::flags::noOwner)) {
     std::cout << f.getOwnerName() << " ";
   }
-  if (!flagSet.test(flags::noGroup)) {
+  if (!args.getFlag(argSet::flags::noGroup)) {
     std::cout << f.getGroupName() << " ";
   }
-  if (flagSet.test(flags::author)) {
+  if (args.getFlag(argSet::flags::author)) {
     std::cout << f.getOwnerName() << " ";
   }
   std::cout << f.getSizeStr() << " ";
@@ -272,10 +286,45 @@ void printLongList(std::vector<fileEnt> & filenames) {
   //TODO pad size column (currently works up to a petabyte)
 
   // Print strings
-  for(fileEnt & f : filenames) {
-    printLongList(f, linksMax);
-  }
+  for_each(filenames.begin(), filenames.end(),
+            [linksMax](auto & f) { 
+              if (!args.getFlag(argSet::flags::noFmt) &&
+                  args.getFlag(argSet::flags::color)) {
+                std::cout << f.getEmphasis();
+                std::cout << f.getColor();
+              }
+              std::cout << f.getPermissionString() << " ";
+              std::cout << f.getRefCnt(linksMax) << " ";
+              if (!args.getFlag(argSet::flags::noOwner)) {
+                std::cout << f.getOwnerName() << " ";
+              }
+              if (!args.getFlag(argSet::flags::noGroup)) {
+                std::cout << f.getGroupName() << " ";
+              }
+              if (args.getFlag(argSet::flags::author)) {
+                std::cout << f.getOwnerName() << " ";
+              }
+              std::cout << f.getSizeStr() << " ";
+              std::cout << f.getTimestampStr() << " ";
+              std::cout << f.getIcon() << " ";
+              std::cout << f.getName() << f.getSuffixIcons();
+              if (f.isLink()) {
+                std::cout << " " << f.getTarget();
+              }
+              std::cout << std::endl; });
 } 
+
+/*
+static std::function<void(fileEnt & f)> printWithFormat(bool color = false) {
+  if (color) {
+    return [](auto & f) { 
+            std::cout << f.getColor() << f.getIcon() << " " << f.getName() << std::endl;};
+  } else {
+    return [](auto & f) {
+            std::cout << f.getName() << std::endl;};
+  }
+}
+*/
 
 /**
  * @brief simply print each file on its own line
@@ -284,7 +333,13 @@ void printLongList(std::vector<fileEnt> & filenames) {
  */
 void printList(std::vector<fileEnt> & filenames) {
   for_each(filenames.begin(), filenames.end(), 
-    [](auto & f){ std::cout << f.getName() << std::endl; });
+           [](auto & f) { 
+            if (args.getFlag(argSet::flags::color)) {
+              std::cout << f.getColor();
+              // TODO break up into its own flag --image=auto...
+              std::cout << f.getIcon() << " ";
+            }
+            std::cout << f.getName() << std::endl;});
 }
 
 /**
@@ -326,23 +381,24 @@ std::string listType;
  *
  * @return std::string the directory to list
  */
-std::string parseArgs(int argc, char * const * argv) {
+void parseArgs(int argc, char * const * argv) {
   short c;
   int  option_index = 0;
 
   // gnu style long options 
   // start switch indices after ascii to avoid collisions
-  enum longOptIndex : short {ft = 128, type = 129, author = 130, noFmt = 131};
+  enum longOptIndex : short {ft = 128, type = 129, author = 130, noFmt = 131, color = 132};
   struct option longopts[] = {
-    {"all",             0, NULL, 'a'},
-    {"allmost-aLl",     0, NULL, 'A'},
-    {"author",          0, NULL, author},
-    {"help",            0, NULL, 'h'},
-    {"reverse",         0, NULL, 'r' },
-    {"ft",              1, NULL, ft },
-    {"noFmt",           0, NULL, noFmt},
-    {"type",            0, NULL, type },
-    {NULL,              0, NULL, 0  }
+    {"all",             0, NULL, 'a'    },
+    {"allmost-aLl",     0, NULL, 'A'    },
+    {"author",          0, NULL, author },
+    {"help",            0, NULL, 'h'    },
+    {"reverse",         0, NULL, 'r'    },
+    {"ft",              1, NULL, ft     },
+    {"noFmt",           0, NULL, noFmt  },
+    {"type",            0, NULL, type   },
+    {"color",           2, NULL, color  },
+    {NULL,              0, NULL, 0      }
   };
 
   // parse the args
@@ -350,36 +406,54 @@ std::string parseArgs(int argc, char * const * argv) {
     switch (c) {
       // Handle long only args
       case ft:
-        flagSet.set(flags::ft);
+        args.setFlag(argSet::flags::ft);
         listType = std::string(optarg);
         break;
-      case type:    flagSet.set(flags::type);   break;
-      case author:  flagSet.set(flags::author); break;
-      case noFmt:   flagSet.set(flags::noFmt);  break;
+      case color:   
+        if (optarg == NULL) {
+          // default to "always"
+          args.setFlag(argSet::flags::color);  
+        } else {
+          std::string colorArg = std::string(optarg);
+          if (!colorArg.compare("auto") && isatty(1)) {
+            // only color the output when stdout is a tty
+            args.setFlag(argSet::flags::color);
+          } else if (!colorArg.compare("always")) { 
+            // always color the output
+            args.setFlag(argSet::flags::color);
+          } else if (!colorArg.compare("never")) {
+            // never color the output
+            args.setFlag(argSet::flags::color, false);
+          }
+        }
+        break;
+      case type:    args.setFlag(argSet::flags::type);   break;
+      case author:  args.setFlag(argSet::flags::author); break;
+      case noFmt:   args.setFlag(argSet::flags::noFmt);  break;
 
       // Handle short args, argumnets with both a long and short argument
       // have their long argument routed to the same location as the short arg
-      case 'a': flagSet.set(flags::all);        break;
-      case 'A': flagSet.set(flags::almostAll);  break;
-      case 'g': flagSet.set(flags::noOwner);    break;
-      case 'h': flagSet.set(flags::help);       break;
-      case 'l': flagSet.set(flags::longList);   break;
-      case 'o': flagSet.set(flags::noGroup);    break;
-      case 'r': flagSet.set(flags::reverse);    break;
-      case 'S': flagSet.set(flags::sortSize);   break;
-      case 't': flagSet.set(flags::sortTime);   break;
-      case 'U': flagSet.set(flags::sortInDir);  break;
-      case 'X': flagSet.set(flags::sortExt);    break;
-      case '1': flagSet.set(flags::filePerLine);break;
+      case 'a': args.setFlag(argSet::flags::all);        break;
+      case 'A': args.setFlag(argSet::flags::almostAll);  break;
+      case 'g': args.setFlag(argSet::flags::noOwner);    break;
+      case 'h': args.setFlag(argSet::flags::help);       break;
+      case 'l': args.setFlag(argSet::flags::longList);   break;
+      case 'o': args.setFlag(argSet::flags::noGroup);    break;
+      case 'r': args.setFlag(argSet::flags::reverse);    break;
+      case 'S': args.setFlag(argSet::flags::sortSize);   break;
+      case 't': args.setFlag(argSet::flags::sortTime);   break;
+      case 'U': args.setFlag(argSet::flags::sortInDir);  break;
+      case 'X': args.setFlag(argSet::flags::sortExt);    break;
+      case '1': args.setFlag(argSet::flags::filePerLine);break;
       default:  execvp("ls", argv);
     }
   }
 
   // Get directory to list or use "." if none provided
   if (optind < argc) {
-    return std::string(argv[optind]); 
+    args.setLsDir(std::string(argv[optind]));
   } else {
-    return ".";
+    args.setLsDir(".");
   }
 }
 
@@ -408,9 +482,9 @@ void getFiles(const std::string lsdir, std::vector<fileEnt> & filenames) {
     // Read out all of the files
     while((dent = readdir(dir))) {
       if (dent->d_name[0] != '.' || 
-          flagSet.test(flags::all) || flagSet.test(flags::almostAll)) {
+          args.getFlag(argSet::flags::all) || args.getFlag(argSet::flags::almostAll)) {
         // Check for -A almost all
-        if (flagSet.test(flags::almostAll) && 
+        if (args.getFlag(argSet::flags::almostAll) && 
            (!strcmp(dent->d_name, ".") || !strcmp(dent->d_name, ".."))) {
           continue;
         }
@@ -499,20 +573,20 @@ void filterFiles(std::vector<fileEnt> & filenames) {
 void sortFiles(std::vector<fileEnt> & filenames) {
   std::function<int(fileEnt const &, fileEnt const &)> sortBy;
 
-  if (flagSet.test(flags::sortInDir)) {
+  if (args.getFlag(argSet::flags::sortInDir)) {
     // Keep the files in the order they were in in the directory
     return;
-  } else if (flagSet.test(flags::sortTime)) {
+  } else if (args.getFlag(argSet::flags::sortTime)) {
     // Sort by time
     sortBy = [](auto const & x, auto const & y) {
               return x.getModTS() < y.getModTS();};
 
-  } else if (flagSet.test(flags::sortSize)) {
+  } else if (args.getFlag(argSet::flags::sortSize)) {
     // Sort by fileSize
     sortBy = [](auto const & x, auto const & y) {
               return x.getSize() < y.getSize();};
 
-  } else if (flagSet.test(flags::sortExt)) {
+  } else if (args.getFlag(argSet::flags::sortExt)) {
     // Sort first by extension then by filename
     sortBy = [](auto const & x, auto const & y) {
               const std::string & xn = x.getName();
@@ -536,7 +610,7 @@ void sortFiles(std::vector<fileEnt> & filenames) {
               return strcasecmp(xc, yc) < 0;};
   };
  
-  if (flagSet.test(flags::reverse)) {
+  if (args.getFlag(argSet::flags::reverse)) {
     std::sort(filenames.rbegin(), filenames.rend(), sortBy);
   } else {
     std::sort(filenames.begin(), filenames.end(), sortBy);
@@ -549,13 +623,13 @@ void sortFiles(std::vector<fileEnt> & filenames) {
  * @param filenames the list of files to be printed
  */
 void printFiles(std::vector<fileEnt> & filenames) {
-  if (flagSet.test(flags::longList) || 
-      flagSet.test(flags::noGroup) || 
-      flagSet.test(flags::noOwner)) {
+  if (args.getFlag(argSet::flags::longList) || 
+      args.getFlag(argSet::flags::noGroup) || 
+      args.getFlag(argSet::flags::noOwner)) {
     // Print in long list format
     printLongList(filenames);
   } else {
-    if (isatty(1) && !flagSet.test(flags::filePerLine)) {
+    if (isatty(1) && !args.getFlag(argSet::flags::filePerLine)) {
       // Print in compact columnar format
       printColumns(filenames);
     } else {
@@ -572,24 +646,24 @@ int main(int argc, char **argv) {
   std::setvbuf(stdout, NULL, _IOFBF, 8192);
 
   // Parse the command line flags and get the directory to list
-  lsdir = parseArgs(argc, argv);
+  parseArgs(argc, argv);
 
   // Print the usage message and exit if the help flag was set
-  if (flagSet.test(flags::help)) { usage(); }
+  if (args.getFlag(argSet::flags::help)) { usage(); }
 
   // get all of the files in the directory
-  getFiles(lsdir, filenames);
+  getFiles(args.getLsDir(), filenames);
 
   // look up the correct format for each file
   getFormatStyle(filenames);
 
   // Filter the filenames to only files with the specified fileType
-  if (flagSet.test(flags::ft)) { filterFiles(filenames); }
+  if (args.getFlag(argSet::flags::ft)) { filterFiles(filenames); }
 
   // Sort the files
   sortFiles(filenames);
 
-  if (flagSet.test(flags::type)) { 
+  if (args.getFlag(argSet::flags::type)) { 
     // Print each typeType together either in long list or columnar format
     printByType(filenames); 
   } else {

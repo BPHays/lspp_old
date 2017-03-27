@@ -1,6 +1,6 @@
 CPP    		 = clang
 LIBS 			 = -lstdc++
-CPPFLAGS 	 = -std=c++14
+CPPFLAGS 	 = -std=c++14 -march=native
 
 DEPS       = lspp.hpp format.hpp fileEnt.hpp
 OBJ 			 = lspp.o format.o fileEnt.o
