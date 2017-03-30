@@ -658,6 +658,7 @@ void printFiles(std::vector<fileEnt> & filenames) {
 
 void listDirectory(std::string lsdir) {
   std::vector<fileEnt>  filenames;
+  std::vector<fileEnt>  directories;
 
   if (args.getFlag(argSet::flags::recursive)) {
     std::cout << std::endl << "\033[0;m" << lsdir << ":" << std::endl;
@@ -668,6 +669,8 @@ void listDirectory(std::string lsdir) {
 
   // look up the correct format for each file
   getFormatStyle(filenames);
+
+  directories = filenames;
 
   // Filter the filenames to only files with the specified fileType
   if (args.getFlag(argSet::flags::ft)) { filterFiles(filenames); }
@@ -685,7 +688,7 @@ void listDirectory(std::string lsdir) {
 
   // After listing the parent directory recursively list all child directories
   if (args.getFlag(argSet::flags::recursive)) {
-    for_each(filenames.begin(), filenames.end(),
+    for_each(directories.begin(), directories.end(),
              [](fileEnt & f) { if (f.getType() == DT_DIR) listDirectory(f.getPath());});
   }
 }
