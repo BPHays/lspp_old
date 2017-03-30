@@ -25,7 +25,10 @@ class argSet {
       noFmt       = 14,     // Dont' color format the output
       filePerLine = 15,     // list a single file per line
       color       = 16,     // colorize the output
+      // TODO icon flag should turn off suffix icons as well
       icon        = 17,     // display icons with the file
+      recursive   = 18,     
+      tree        = 19,     
       nFlags      = 64
     };
 

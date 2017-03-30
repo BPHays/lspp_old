@@ -25,7 +25,7 @@ fileEnt::fileEnt(std::string dir, std::string name, unsigned char type) :
   _nSuffixIcons(0)
   {
     if (stat(_path.c_str(), &_stat) < 0) {
-      perror("");
+      perror("fileEnt::fileEnt");
     };
     if (isLink()) {
       ++_nSuffixIcons;
@@ -43,6 +43,7 @@ fileEnt::~fileEnt(){}
  * @return the file's name ex file.c
  */
 std::string fileEnt::getName() const { return _name; }
+std::string fileEnt::getPath() const { return _path; }
 
 
 /**
@@ -176,6 +177,7 @@ bool fileEnt::isLink() const {
  * @return human readable permissions bits string
  */
 std::string fileEnt::getPermissionString() const {
+  struct stat lstats;
   std::string permStr = "";
 
   // Set the type char
@@ -198,10 +200,34 @@ std::string fileEnt::getPermissionString() const {
     case DT_FIFO:
       permStr += 'p';
       break;
-    case DT_REG:
-      // fallthrough
     case DT_UNKNOWN:
-      // fallthrough
+      // lstat the file if no dirent data
+      lstat(_path.c_str(), &lstats);
+      switch(lstats.st_mode) {
+        case S_IFLNK:
+          permStr += 'l';
+          break;
+        case S_IFDIR:
+          permStr += 'd';
+          break;
+        case S_IFBLK:
+          permStr += 'b';
+          break;
+        case S_IFCHR:
+          permStr += 'c';
+          break;
+        case S_IFSOCK:
+          permStr += 's';
+          break;
+        case S_IFIFO:
+          permStr += 'p';
+          break;
+        default:
+          permStr += '-';
+      }
+      break;
+    case DT_REG:
+      /* fallthrough */
     default:
       permStr += '-';
   }
@@ -280,7 +306,7 @@ const char * fileEnt::getEmphasis() const {
  * @return padded human readable file size
  */
 std::string fileEnt::getSizeStr() const {
-  const char *prefix[] = {"  B", "KiB", "MiB", "GiB", "TiB"};
+  const char *prefix[] = {"  B", "KiB", "MiB", "GiB", "TiB", "PiB", "XiB"};
   off_t size = getStat().st_size;
   size_t i = 0;
   while(size > 1024 && i < sizeof(prefix) - 1) {

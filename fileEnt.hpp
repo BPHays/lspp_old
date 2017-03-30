@@ -33,6 +33,7 @@ class fileEnt {
     const std::string & getColor()                    const;
     const std::string & getIcon()                     const;
           std::string   getName()                     const;
+          std::string   getPath()                     const;
     const size_t      & getNSuffixIcons()             const;
           time_t        getModTS()                    const;
           off_t         getSize()                     const;

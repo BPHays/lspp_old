@@ -163,7 +163,9 @@ static void printFormatColumn(fileEnt & f, size_t length) {
   if (args.getFlag(argSet::flags::color)) {
     std::cout << f.getColor();
   }
-  std::cout << f.getIcon() << " ";
+  if (args.getFlag(argSet::flags::icon)) {
+    std::cout << f.getIcon() << " ";
+  }
   std::cout << f.getName() << f.getSuffixIcons() << padding;
 }
 
@@ -306,25 +308,15 @@ void printLongList(std::vector<fileEnt> & filenames) {
               }
               std::cout << f.getSizeStr() << " ";
               std::cout << f.getTimestampStr() << " ";
-              std::cout << f.getIcon() << " ";
+              if (args.getFlag(argSet::flags::icon)) {
+                std::cout << f.getIcon() << " ";
+              }
               std::cout << f.getName() << f.getSuffixIcons();
               if (f.isLink()) {
                 std::cout << " " << f.getTarget();
               }
               std::cout << std::endl; });
 } 
-
-/*
-static std::function<void(fileEnt & f)> printWithFormat(bool color = false) {
-  if (color) {
-    return [](auto & f) { 
-            std::cout << f.getColor() << f.getIcon() << " " << f.getName() << std::endl;};
-  } else {
-    return [](auto & f) {
-            std::cout << f.getName() << std::endl;};
-  }
-}
-*/
 
 /**
  * @brief simply print each file on its own line
@@ -336,7 +328,8 @@ void printList(std::vector<fileEnt> & filenames) {
            [](auto & f) { 
             if (args.getFlag(argSet::flags::color)) {
               std::cout << f.getColor();
-              // TODO break up into its own flag --image=auto...
+            }
+            if (args.getFlag(argSet::flags::icon)) {
               std::cout << f.getIcon() << " ";
             }
             std::cout << f.getName() << std::endl;});
@@ -387,7 +380,9 @@ void parseArgs(int argc, char * const * argv) {
 
   // gnu style long options 
   // start switch indices after ascii to avoid collisions
-  enum longOptIndex : short {ft = 128, type = 129, author = 130, noFmt = 131, color = 132};
+  enum longOptIndex : short {
+    ft = 128, type = 129, author = 130, noFmt = 131, color = 132, 
+    icon = 133, tree = 134};
   struct option longopts[] = {
     {"all",             0, NULL, 'a'    },
     {"allmost-aLl",     0, NULL, 'A'    },
@@ -398,11 +393,14 @@ void parseArgs(int argc, char * const * argv) {
     {"noFmt",           0, NULL, noFmt  },
     {"type",            0, NULL, type   },
     {"color",           2, NULL, color  },
+    {"icon",            2, NULL, icon   },
+    {"recursive",       0, NULL, 'R'},
+    {"tree",            0, NULL, tree},
     {NULL,              0, NULL, 0      }
   };
 
   // parse the args
-  while((c = getopt_long(argc, argv, "aAghlorStUX1", longopts, &option_index)) != -1) {
+  while((c = getopt_long(argc, argv, "aAghlorRStUX1", longopts, &option_index)) != -1) {
     switch (c) {
       // Handle long only args
       case ft:
@@ -427,9 +425,28 @@ void parseArgs(int argc, char * const * argv) {
           }
         }
         break;
+      case icon:   
+        if (optarg == NULL) {
+          // default to "always"
+          args.setFlag(argSet::flags::icon);  
+        } else {
+          std::string iconArg = std::string(optarg);
+          if (!iconArg.compare("auto") && isatty(1)) {
+            // only color the output when stdout is a tty
+            args.setFlag(argSet::flags::icon);
+          } else if (!iconArg.compare("always")) { 
+            // always color the output
+            args.setFlag(argSet::flags::icon);
+          } else if (!iconArg.compare("never")) {
+            // never color the output
+            args.setFlag(argSet::flags::icon, false);
+          }
+        }
+        break;
       case type:    args.setFlag(argSet::flags::type);   break;
       case author:  args.setFlag(argSet::flags::author); break;
       case noFmt:   args.setFlag(argSet::flags::noFmt);  break;
+      case tree:    args.setFlag(argSet::flags::tree);   break;
 
       // Handle short args, argumnets with both a long and short argument
       // have their long argument routed to the same location as the short arg
@@ -440,6 +457,7 @@ void parseArgs(int argc, char * const * argv) {
       case 'l': args.setFlag(argSet::flags::longList);   break;
       case 'o': args.setFlag(argSet::flags::noGroup);    break;
       case 'r': args.setFlag(argSet::flags::reverse);    break;
+      case 'R': args.setFlag(argSet::flags::recursive);  break;
       case 'S': args.setFlag(argSet::flags::sortSize);   break;
       case 't': args.setFlag(argSet::flags::sortTime);   break;
       case 'U': args.setFlag(argSet::flags::sortInDir);  break;
@@ -496,16 +514,16 @@ void getFiles(const std::string lsdir, std::vector<fileEnt> & filenames) {
     // TODO either need to read the directory above the file, or need
     // to have a way to not need to use the dirent data
     // currently lists the file and doesn't crash but metadata is garbage
+    std::string name, dir;
     std::size_t index = lsdir.find_last_of("/");
-    std::string name, lsdir;
     if (index == std::string::npos) {
       name = lsdir;
-      lsdir = "";
+      dir = ".";
     } else {
-      lsdir = lsdir.substr(index);
+      dir = lsdir.substr(index);
       name = lsdir.substr(index + 1);
     }
-    filenames.push_back(fileEnt(lsdir, name));
+    filenames.push_back(fileEnt(dir, name));
   }
 }
 
@@ -638,21 +656,15 @@ void printFiles(std::vector<fileEnt> & filenames) {
   }
 }
 
-int main(int argc, char **argv) {
+void listDirectory(std::string lsdir) {
   std::vector<fileEnt>  filenames;
-  std::string           lsdir;
 
-  std::cout.sync_with_stdio(false);
-  std::setvbuf(stdout, NULL, _IOFBF, 8192);
-
-  // Parse the command line flags and get the directory to list
-  parseArgs(argc, argv);
-
-  // Print the usage message and exit if the help flag was set
-  if (args.getFlag(argSet::flags::help)) { usage(); }
+  if (args.getFlag(argSet::flags::recursive)) {
+    std::cout << std::endl << "\033[0;m" << lsdir << ":" << std::endl;
+  }
 
   // get all of the files in the directory
-  getFiles(args.getLsDir(), filenames);
+  getFiles(lsdir, filenames);
 
   // look up the correct format for each file
   getFormatStyle(filenames);
@@ -670,4 +682,25 @@ int main(int argc, char **argv) {
     // Print the files normally
     printFiles(filenames);
   }
+
+  // After listing the parent directory recursively list all child directories
+  if (args.getFlag(argSet::flags::recursive)) {
+    for_each(filenames.begin(), filenames.end(),
+             [](fileEnt & f) { if (f.getType() == DT_DIR) listDirectory(f.getPath());});
+  }
+}
+
+int main(int argc, char **argv) {
+  std::string           lsdir;
+
+  std::cout.sync_with_stdio(false);
+  std::setvbuf(stdout, NULL, _IOFBF, 8192);
+
+  // Parse the command line flags and get the directory to list
+  parseArgs(argc, argv);
+
+  // Print the usage message and exit if the help flag was set
+  if (args.getFlag(argSet::flags::help)) { usage(); }
+
+  listDirectory(args.getLsDir());
 }

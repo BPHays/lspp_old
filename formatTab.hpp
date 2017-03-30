@@ -13,7 +13,7 @@ const fileType file =         {"file", NULL};
   const fileType compiledType = {"comp",    &file};
   const fileType tmpType =      {"tmp",     &file};
   const fileType rcType =       {"rc", &file};
-  const fileType dir =        {"dir", NULL};
+  const fileType dir =          {"dir", NULL};
 
 /* general format entries accessed by index from enum */
 const fileFmt generalFormat[] = {
