@@ -10,11 +10,21 @@
 #define BLUE    "12"
 #define PURPLE  "13"
 #define CYAN    "14"
+#define WHITE   "7"
 
 #define LTGREY  "252"
 #define DKGREY  "244"
 #define INDIGO  "105"
 #define ORANGE  "216"
+
+const std::string RWX_PERM = COLOR_ESC(WHITE);
+const std::string W_PERM   = COLOR_ESC(YELLOW);
+const std::string RW_PERM  = COLOR_ESC(GREEN);
+const std::string R_PERM   = COLOR_ESC(BLUE);
+const std::string RX_PERM  = COLOR_ESC(PURPLE);
+const std::string X_PERM   = COLOR_ESC(RED);
+const std::string WX_PERM  = COLOR_ESC(ORANGE);
+const std::string NO_PERM  = COLOR_ESC(DKGREY);
 
 // Generic
 #define FILE_C    COLOR_ESC(ORANGE)

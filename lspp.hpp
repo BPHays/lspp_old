@@ -22,13 +22,14 @@ class argSet {
       sortExt     = 11,     // sort by extension
       reverse     = 12,     // reverse the sorting
       author      = 13,     // show auther (same as owner on linux)
-      noFmt       = 14,     // Dont' color format the output
+      noFmt       = 15,     // Dont' color format the output
       filePerLine = 15,     // list a single file per line
       color       = 16,     // colorize the output
       // TODO icon flag should turn off suffix icons as well
       icon        = 17,     // display icons with the file
-      recursive   = 18,     
+      recursive   = 18,     // recursively print subdirectories
       tree        = 19,     
+      perm        = 20,     // color the files by the user's file permissions   
       nFlags      = 64
     };
 
@@ -54,6 +55,11 @@ class argSet {
     inline void setLsDir(std::string lsdir)          { _lsdir = lsdir; }
 };
 
+class listTree {
+  fileEnt              node;
+  std::vector<fileEnt> children;
+};
+
 argSet args;
 
 void usage();
@@ -64,6 +70,8 @@ void fileterFiles(std::vector<fileEnt> & filenames);
 void sortFiles(std::vector<fileEnt> & filenames);
 void printFiles(std::vector<fileEnt> & filenames);
 void printByType(std::vector<fileEnt> & filenames);
+
+void listDirectory(std::string lsdir);
 
 // Helper functions for finding the file format and type
 bool lookupByFilename(fileEnt & f);

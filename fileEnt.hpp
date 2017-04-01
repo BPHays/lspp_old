@@ -31,6 +31,7 @@ class fileEnt {
     // Direct member getters
           unsigned char getType() const;
     const std::string & getColor()                    const;
+    const std::string & getPermColor()                const;
     const std::string & getIcon()                     const;
           std::string   getName()                     const;
           std::string   getPath()                     const;
@@ -52,6 +53,7 @@ class fileEnt {
     const char        * getLink()                     const;
     const fileType    * getFileType()                 const;
           bool          isLink()                      const;
+          bool          isDir()                       const;
           bool          isVisible()                   const;
 
   private:

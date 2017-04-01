@@ -63,7 +63,6 @@ const fileFmt extFormat[] = {
   {"png",       "",      IMG,       &imgType},
   {"psb",       "",      IMG,       &imgType},
   {"psd",       "",      IMG,       &imgType},
-  {"ts",        "",      IMG,       &imgType},
 
   {"mp3",       "",      AUDIO,     &audioType},
   {"wav",       "",      AUDIO,     &audioType},
@@ -174,6 +173,7 @@ const fileFmt extFormat[] = {
   {"styl",      "",      SRC,       &srcType},
   {"suo",       "",      SRC,       &srcType},
   {"tex",       "",      SRC,       &srcType},
+  {"ts",        "",      SRC,       &srcType},
   {"twig",      "",      SRC,       &srcType},
   {"vim",       "",      SRC,       &srcType},
   {"xul",       "",      SRC,       &srcType},

@@ -116,6 +116,37 @@ const std::string & fileEnt::getColor() const {
   return _fmt->fmt;
 }
 
+
+/**
+ * @brief return the color format for the permissions bits
+ *
+ * @return the correct format for the file's permissions
+ */
+const std::string & fileEnt::getPermColor() const {
+  // TODO get the current user's permissions so may need to check group/others
+  switch ((_stat.st_mode >> 6) & 7) {
+    case 7:
+      return RWX_PERM;
+    case 6:
+      return RW_PERM;
+    case 5:
+      return RX_PERM;
+    case 4:
+      return R_PERM;
+    case 3:
+      return WX_PERM;
+    case 2:
+      return W_PERM;
+    case 1:
+      return X_PERM;
+    case 0:
+      return NO_PERM;
+  }
+
+  /* Should never get here */
+  assert(0);
+}
+
 /**
  * @brief get the entries icon format field
  *
@@ -165,6 +196,21 @@ bool fileEnt::isLink() const {
       lstat(_path.c_str(), &lstats);
       return S_ISLNK(lstats.st_mode);
     case DT_LNK:
+      return true;
+    default:
+      return false;
+  }
+}
+
+bool fileEnt::isDir() const {
+  struct stat lstats;
+  switch(_type) {
+    case DT_UNKNOWN:
+      // Only used for filesystems that don't support d_type in dirents
+      // Requires an extra call to stat
+      lstat(_path.c_str(), &lstats);
+      return S_ISDIR(lstats.st_mode);
+    case DT_DIR:
       return true;
     default:
       return false;
