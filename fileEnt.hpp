@@ -2,7 +2,10 @@
 #define FILEENT_HPP
 
 #include <unordered_map>
+
 #include <string.h>
+#include <sys/stat.h>
+#include <dirent.h>
 
 #include "format.hpp"
 
@@ -37,6 +40,7 @@ class fileEnt {
           std::string   getPath()                     const;
     const size_t      & getNSuffixIcons()             const;
           time_t        getModTS()                    const;
+          time_t        getAccTS()                    const;
           off_t         getSize()                     const;
 
     // Other getters

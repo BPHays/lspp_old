@@ -426,3 +426,7 @@ time_t fileEnt::getModTS() const {
   return getStat().st_mtim.tv_sec;
 }
 
+time_t fileEnt::getAccTS() const {
+  return getStat().st_atim.tv_sec;
+}
+

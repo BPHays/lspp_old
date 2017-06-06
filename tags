@@ -1,0 +1,191 @@
+!_TAG_FILE_FORMAT	2	/extended format; --format=1 will not append ;" to lines/
+!_TAG_FILE_SORTED	1	/0=unsorted, 1=sorted, 2=foldcase/
+!_TAG_PROGRAM_AUTHOR	Darren Hiebert	/dhiebert@users.sourceforge.net/
+!_TAG_PROGRAM_NAME	Exuberant Ctags	//
+!_TAG_PROGRAM_URL	http://ctags.sourceforge.net	/official site/
+!_TAG_PROGRAM_VERSION	5.8	//
+ARGSET_HPP	argSet.hpp	2;"	d
+AUDIO	format.hpp	56;"	d
+BLUE	format.hpp	10;"	d
+BOLD	format.hpp	59;"	d
+COLOR_ESC	format.hpp	5;"	d
+COMPILED	format.hpp	43;"	d
+COMPRESS	format.hpp	49;"	d
+CPP	Makefile	/^CPP    		 = clang$/;"	m
+CPPFLAGS	Makefile	/^CPPFLAGS 	 = -std=c++14$/;"	m
+CYAN	format.hpp	12;"	d
+DEPS	Makefile	/^DEPS       = lspp.hpp format.hpp fileEnt.hpp$/;"	m
+DEV_C	format.hpp	33;"	d
+DIR_C	format.hpp	32;"	d
+DKGREY	format.hpp	16;"	d
+DOTFILE	format.hpp	36;"	d
+ESC	format.hpp	4;"	d
+EXE	format.hpp	39;"	d
+FIFO_C	format.hpp	35;"	d
+FILEENT_HPP	fileEnt.hpp	2;"	d
+FILE_C	format.hpp	31;"	d
+FORMATTAB_HPP	formatTab.hpp	2;"	d
+FORMAT_HPP	format.hpp	2;"	d
+GREEN	format.hpp	8;"	d
+IMG	format.hpp	55;"	d
+INDIGO	format.hpp	17;"	d
+LIBS	Makefile	/^LIBS 			 = -lstdc++$/;"	m
+LINK_ICON	format.hpp	62;"	d
+LSPP_HPP	lspp.hpp	2;"	d
+LTGREY	format.hpp	15;"	d
+NO_EMPH	format.hpp	60;"	d
+NO_PERM	format.hpp	/^const std::string NO_PERM  = COLOR_ESC(DKGREY);$/;"	v
+OBJ	Makefile	/^OBJ 			 = lspp.o format.o fileEnt.o$/;"	m
+ORANGE	format.hpp	18;"	d
+PRINTFILES_HPP	printFiles.hpp	2;"	d
+PURPLE	format.hpp	11;"	d
+RED	format.hpp	7;"	d
+RWX_PERM	format.hpp	/^const std::string RWX_PERM = COLOR_ESC(WHITE);$/;"	v
+RW_PERM	format.hpp	/^const std::string RW_PERM  = COLOR_ESC(GREEN);$/;"	v
+RX_PERM	format.hpp	/^const std::string RX_PERM  = COLOR_ESC(PURPLE);$/;"	v
+R_PERM	format.hpp	/^const std::string R_PERM   = COLOR_ESC(BLUE);$/;"	v
+SOCK_C	format.hpp	34;"	d
+SRC	format.hpp	42;"	d
+TMP	format.hpp	52;"	d
+TREE_BRANCH_DOWN	format.hpp	/^const std::string TREE_BRANCH_DOWN  = "\\u252c";$/;"	v
+TREE_BRANCH_RIGHT	format.hpp	/^const std::string TREE_BRANCH_RIGHT = "\\u251c";$/;"	v
+TREE_COLOR	format.hpp	/^const std::string TREE_COLOR        = DIR_C;$/;"	v
+TREE_ELBOW	format.hpp	/^const std::string TREE_ELBOW        = "\\u2514";$/;"	v
+TREE_EMPTY_SPACE	format.hpp	/^const std::string TREE_EMPTY_SPACE  = " ";$/;"	v
+TREE_HORIZONTAL	format.hpp	/^const std::string TREE_HORIZONTAL   = "\\u2500";$/;"	v
+TREE_VERTICAL	format.hpp	/^const std::string TREE_VERTICAL     = "\\u2502";$/;"	v
+TXT	format.hpp	46;"	d
+VIDEO	format.hpp	57;"	d
+VISIBLE_ICON	format.hpp	63;"	d
+WHITE	format.hpp	13;"	d
+WX_PERM	format.hpp	/^const std::string WX_PERM  = COLOR_ESC(ORANGE);$/;"	v
+W_PERM	format.hpp	/^const std::string W_PERM   = COLOR_ESC(YELLOW);$/;"	v
+X_PERM	format.hpp	/^const std::string X_PERM   = COLOR_ESC(RED);$/;"	v
+YELLOW	format.hpp	9;"	d
+_filenames	printer.hpp	/^    std::vector<fileEnt>                   & _filenames;$/;"	m	class:printer
+_flagBits	argSet.hpp	/^    std::bitset<nFlags> _flagBits;$/;"	m	class:argSet
+_fmt	fileEnt.hpp	/^    const fileFmt *_fmt;          \/\/ associated format struct$/;"	m	class:fileEnt
+_getLength	printer.hpp	/^    std::function<ssize_t(fileEnt const &)>  _getLength;$/;"	m	class:printer
+_lsdir	argSet.hpp	/^    std::string         _lsdir;$/;"	m	class:argSet
+_nSuffixIcons	fileEnt.hpp	/^    size_t         _nSuffixIcons; \/\/ number of suffix icons$/;"	m	class:fileEnt
+_name	fileEnt.hpp	/^    std::string    _name;         \/\/ File name d.ex$/;"	m	class:fileEnt
+_path	fileEnt.hpp	/^    std::string    _path;         \/\/ Full file path a\/b\/c\/d.ex$/;"	m	class:fileEnt
+_printFile	printer.hpp	/^    std::function<void(fileEnt const &)>     _printFile;$/;"	m	class:printer
+_stat	fileEnt.hpp	/^    struct stat    _stat;         \/\/ file stats from stat syscall$/;"	m	class:fileEnt	typeref:struct:fileEnt::stat
+_type	fileEnt.hpp	/^    unsigned char  _type;         \/\/ dirent type$/;"	m	class:fileEnt
+archiveType	formatTab.hpp	/^  const fileType archiveType =  {"arch",    &file};$/;"	v
+argSet	argSet.hpp	/^class argSet {$/;"	c
+args	lspp.cpp	/^argSet args;$/;"	v
+audioType	formatTab.hpp	/^  const fileType audioType =    {"audio",   &file};$/;"	v
+children	lspp.hpp	/^  std::vector<fileEnt> children;$/;"	m	class:listTree
+compiledType	formatTab.hpp	/^  const fileType compiledType = {"comp",    &file};$/;"	v
+dir	formatTab.hpp	/^  const fileType dir =          {"dir", NULL};$/;"	v
+exeType	formatTab.hpp	/^  const fileType exeType =      {"exe",     &file};$/;"	v
+extFormat	formatTab.hpp	/^const fileFmt extFormat[] = {$/;"	v
+file	formatTab.hpp	/^const fileType file =         {"file", NULL};$/;"	v
+fileEnt	fileEnt.cpp	/^fileEnt::fileEnt(std::string dir, std::string name, unsigned char type) :$/;"	f	class:fileEnt
+fileEnt	fileEnt.hpp	/^class fileEnt {$/;"	c
+fileFmt	format.hpp	/^  fileFmt(std::string name, std::string icon, std::string fmt, const fileType *parent) : name(name), icon(icon), fmt(fmt), parent(parent){};$/;"	f	struct:fileFmt
+fileFmt	format.hpp	/^struct fileFmt \/*: format*\/ {$/;"	s
+fileNameFmt	format.hpp	/^  fileNameFmt(std::string name, std::string icon, std::string fmt, const fileType *parent, bool reg) : fileFmt(name, icon, fmt, parent), reg(reg){};$/;"	f	struct:fileNameFmt
+fileNameFmt	format.hpp	/^struct fileNameFmt : fileFmt {$/;"	s
+fileType	format.hpp	/^struct fileType \/*: format*\/ {$/;"	s
+filterFiles	lspp.cpp	/^void filterFiles(std::vector<fileEnt> & filenames) {$/;"	f
+fitsInNRows	printFiles.cpp	/^static bool fitsInNRows($/;"	f	file:
+fmt	format.hpp	/^  std::string  fmt;$/;"	m	struct:fileFmt
+formatted	fileEnt.cpp	/^std::string fileEnt::formatted(size_t length) const {$/;"	f	class:fileEnt
+generalFormat	formatTab.hpp	/^const fileFmt generalFormat[] = {$/;"	v
+getAccTS	fileEnt.cpp	/^time_t fileEnt::getAccTS() const {$/;"	f	class:fileEnt
+getColor	fileEnt.cpp	/^const std::string & fileEnt::getColor() const {$/;"	f	class:fileEnt
+getEmphasis	fileEnt.cpp	/^const char * fileEnt::getEmphasis() const {$/;"	f	class:fileEnt
+getFileType	fileEnt.cpp	/^const fileType * fileEnt::getFileType() const {$/;"	f	class:fileEnt
+getFiles	lspp.cpp	/^void getFiles(const std::string lsdir, std::vector<fileEnt> & filenames) {$/;"	f
+getFlag	argSet.hpp	/^    inline       bool          getFlag(flags flag) const { return _flagBits.test(flag); };$/;"	f	class:argSet
+getFormatStyle	lspp.cpp	/^void getFormatStyle(std::vector<fileEnt> & filenames) {$/;"	f
+getFullLength	printer.cpp	/^const std::function<ssize_t(fileEnt const &)> printer::getFullLength =$/;"	m	class:printer	file:
+getGroupName	fileEnt.cpp	/^std::string & fileEnt::getGroupName() const {$/;"	f	class:fileEnt
+getIcon	fileEnt.cpp	/^const std::string & fileEnt::getIcon() const {$/;"	f	class:fileEnt
+getLink	fileEnt.cpp	/^const char * fileEnt::getLink() const {$/;"	f	class:fileEnt
+getLongLength	printer.cpp	/^const std::functino<ssize_t(fileEnt const&)> printer::getLongLength =$/;"	m	class:printer	file:
+getLongListSizes	printer.cpp	/^void printer::getLongListSizes(size_t & linksMax) {$/;"	f	class:printer
+getLsDir	argSet.hpp	/^    inline const std::string & getLsDir()          const { return _lsdir; }$/;"	f	class:argSet
+getModTS	fileEnt.cpp	/^time_t fileEnt::getModTS() const {$/;"	f	class:fileEnt
+getNSuffixIcons	fileEnt.cpp	/^const size_t & fileEnt::getNSuffixIcons() const { return _nSuffixIcons; }$/;"	f	class:fileEnt
+getName	fileEnt.cpp	/^std::string fileEnt::getName() const { return _name; }$/;"	f	class:fileEnt
+getOwnerName	fileEnt.cpp	/^std::string & fileEnt::getOwnerName() const {$/;"	f	class:fileEnt
+getPath	fileEnt.cpp	/^std::string fileEnt::getPath() const { return _path; }$/;"	f	class:fileEnt
+getPermColor	fileEnt.cpp	/^const std::string & fileEnt::getPermColor() const {$/;"	f	class:fileEnt
+getPermissionString	fileEnt.cpp	/^std::string fileEnt::getPermissionString() const {$/;"	f	class:fileEnt
+getRefCnt	fileEnt.cpp	/^std::string fileEnt::getRefCnt(int padding) const {$/;"	f	class:fileEnt
+getShortLength	printFiles.cpp	/^ssize_t getShortLength(fileEnt & f) {$/;"	f
+getSize	fileEnt.cpp	/^off_t fileEnt::getSize() const {$/;"	f	class:fileEnt
+getSizeStr	fileEnt.cpp	/^std::string fileEnt::getSizeStr() const {$/;"	f	class:fileEnt
+getSuffixIcons	fileEnt.cpp	/^std::string fileEnt::getSuffixIcons() const {$/;"	f	class:fileEnt
+getTarget	fileEnt.cpp	/^std::string fileEnt::getTarget() const {$/;"	f	class:fileEnt
+getTimestampStr	fileEnt.cpp	/^std::string fileEnt::getTimestampStr() const {$/;"	f	class:fileEnt
+getType	fileEnt.cpp	/^unsigned char fileEnt::getType() const { return _type; }$/;"	f	class:fileEnt
+groupNames	fileEnt.cpp	/^std::unordered_map<gid_t, std::string> fileEnt::groupNames;$/;"	m	class:fileEnt	file:
+groupNames	fileEnt.hpp	/^    static std::unordered_map<gid_t, std::string> groupNames;$/;"	m	class:fileEnt
+icon	format.hpp	/^  std::string  icon;$/;"	m	struct:fileFmt
+imgType	formatTab.hpp	/^  const fileType imgType =      {"img",     &file};$/;"	v
+isChildType	lspp.cpp	/^bool isChildType(const fileType * fType, std::string typeName) {$/;"	f
+isDir	fileEnt.cpp	/^bool fileEnt::isDir() const {$/;"	f	class:fileEnt
+isLink	fileEnt.cpp	/^bool fileEnt::isLink() const {$/;"	f	class:fileEnt
+isVisible	fileEnt.cpp	/^bool fileEnt::isVisible() const {$/;"	f	class:fileEnt
+listDirectory	lspp.cpp	/^void listDirectory(std::string lsdir) {$/;"	f
+listTree	lspp.cpp	/^void listTree(std::string lsdir) {$/;"	f
+listTree	lspp.hpp	/^class listTree {$/;"	c
+listType	lspp.cpp	/^std::string listType;$/;"	v
+lookupByExtension	lspp.cpp	/^bool lookupByExtension(fileEnt & f, std::string baseName, std::string extension) {$/;"	f
+lookupByFilename	lspp.cpp	/^bool lookupByFilename(fileEnt & f) {$/;"	f
+main	lspp.cpp	/^int main(int argc, char **argv) {$/;"	f
+name	format.hpp	/^  std::string  name;$/;"	m	struct:fileFmt
+nameFormat	formatTab.hpp	/^const fileNameFmt nameFormat[] = {$/;"	v
+node	lspp.hpp	/^  fileEnt              node;$/;"	m	class:listTree
+opterr	lspp.cpp	/^extern int opterr = 0;$/;"	v
+parent	format.hpp	/^  const fileType    *parent;$/;"	m	struct:fileFmt
+parent	format.hpp	/^  const fileType   *parent;$/;"	m	struct:fileType
+parseArgs	lspp.cpp	/^void parseArgs(int argc, char * const * argv) {$/;"	f
+printByType	printFiles.cpp	/^void printByType(std::vector<fileEnt> & filenames) {$/;"	f
+printByType	printer.cpp	/^void printer::printByType() {$/;"	f	class:printer
+printColumns	printFiles.cpp	/^void printColumns(std::vector<fileEnt> & filenames) {$/;"	f
+printFiles	printFiles.cpp	/^void printFiles(std::vector<fileEnt> & filenames) {$/;"	f
+printFiles	printer.cpp	/^void printer::printFiles() {$/;"	f	class:printer
+printFormatColumn	printFiles.cpp	/^static void printFormatColumn(fileEnt & f, size_t length) {$/;"	f	file:
+printFormatColumn	printer.cpp	/^void printer::printFormatColumn(fileEnt & f, size_t length) {$/;"	f	class:printer
+printList	printFiles.cpp	/^void printList(std::vector<fileEnt> & filenames) {$/;"	f
+printList	printer.cpp	/^void printer::printList() {$/;"	f	class:printer
+printLongFormat	printFiles.cpp	/^const std::function<void(fileEnt & f)> printLongFormat(size_t linksMax) {$/;"	f
+printLongFormat	printer.cpp	/^const std::function<void(fileEnt & f)> printer::printLongFormat(size_t linksMax) {$/;"	f	class:printer
+printLongFormat	printer.hpp	/^    const std::function<void(fileEng const &)> printLongFormat;$/;"	m	class:printer
+printLongList	printFiles.cpp	/^void printLongList(std::vector<fileEnt> & filenames) {$/;"	f
+printLongList	printer.cpp	/^void printer::printLongList() {$/;"	f	class:printer
+printPadding	printFiles.cpp	/^static void printPadding(size_t len) {$/;"	f	file:
+printPadding	printer.cpp	/^static void printer::printPadding(size_t len) {$/;"	f	class:printer
+printShortFormat	printFiles.cpp	/^const std::function<void(fileEnt const &)> printShortFormat = $/;"	v
+printShortFormat	printer.cpp	/^const std::function<void(fileEnt const &)> printer::printShortFormat = $/;"	m	class:printer	file:
+printShortFormat	printer.hpp	/^    const std::function<void(fileEng const &)> printShortFormat;$/;"	m	class:printer
+printShortLine	printFiles.cpp	/^const std::function<void(fileEnt const &)> printShortLine =$/;"	v
+printShortLine	printer.cpp	/^const std::function<void(fileEnt const &)> printer::printShortLine =$/;"	m	class:printer	file:
+printShortLine	printer.hpp	/^    const std::function<void(fileEng const &)> printShortLine;$/;"	m	class:printer
+printTree	printFiles.cpp	/^void printTree(std::vector<fileEnt> & filenames) {$/;"	f
+printTree	printer.cpp	/^void printTree() {$/;"	f
+printer	printer.cpp	/^printer::printer(std:vector<fileEnt> filenames,$/;"	f	class:printer
+printer	printer.hpp	/^class printer {$/;"	c
+rcType	formatTab.hpp	/^  const fileType rcType =       {"rc", &file};$/;"	v
+recursiveList	lspp.cpp	/^void recursiveList(std::string lsdir) {$/;"	f
+reg	format.hpp	/^  bool reg;$/;"	m	struct:fileNameFmt
+setFlag	argSet.hpp	/^    inline void setFlag(flags flag, bool val = true) { _flagBits.set(flag, val); }$/;"	f	class:argSet
+setFmt	fileEnt.cpp	/^void fileEnt::setFmt(const fileFmt *fmt) { $/;"	f	class:fileEnt
+setLsDir	argSet.hpp	/^    inline void setLsDir(std::string lsdir)          { _lsdir = lsdir; }$/;"	f	class:argSet
+sortFiles	lspp.cpp	/^void sortFiles(std::vector<fileEnt> & filenames) {$/;"	f
+srcType	formatTab.hpp	/^  const fileType srcType =      {"src",     &file};$/;"	v
+tmpType	formatTab.hpp	/^  const fileType tmpType =      {"tmp",     &file};$/;"	v
+txtType	formatTab.hpp	/^  const fileType txtType =      {"txt",     &file};$/;"	v
+typeName	format.hpp	/^  std::string typeName;$/;"	m	struct:fileType
+usage	lspp.cpp	/^void usage() {$/;"	f
+usageMsg	usage.hpp	/^std::string usageMsg = $/;"	v
+userNames	fileEnt.cpp	/^std::unordered_map<uid_t, std::string> fileEnt::userNames;$/;"	m	class:fileEnt	file:
+userNames	fileEnt.hpp	/^    static std::unordered_map<uid_t, std::string> userNames;$/;"	m	class:fileEnt
+webDevType	formatTab.hpp	/^    const fileType webDevType =   {"webdev", &srcType};$/;"	v
+~fileEnt	fileEnt.cpp	/^fileEnt::~fileEnt(){}$/;"	f	class:fileEnt

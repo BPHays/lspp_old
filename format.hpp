@@ -17,6 +17,7 @@
 #define INDIGO  "105"
 #define ORANGE  "216"
 
+// File permission colors
 const std::string RWX_PERM = COLOR_ESC(WHITE);
 const std::string W_PERM   = COLOR_ESC(YELLOW);
 const std::string RW_PERM  = COLOR_ESC(GREEN);
@@ -60,6 +61,15 @@ const std::string NO_PERM  = COLOR_ESC(DKGREY);
 
 #define LINK_ICON     "\uf0c1"
 #define VISIBLE_ICON  "\uf06e"
+
+// Tree characters
+const std::string TREE_COLOR        = DIR_C;
+const std::string TREE_ELBOW        = "\u2514";
+const std::string TREE_BRANCH_RIGHT = "\u251c";
+const std::string TREE_BRANCH_DOWN  = "\u252c";
+const std::string TREE_VERTICAL     = "\u2502";
+const std::string TREE_HORIZONTAL   = "\u2500";
+const std::string TREE_EMPTY_SPACE  = " ";
 
 enum generalFormatIndex : int {
   fileIndex = 0, 

@@ -1,6 +1,6 @@
 CPP    		 = clang
 LIBS 			 = -lstdc++
-CPPFLAGS 	 = -std=c++14 -march=native
+CPPFLAGS 	 = -std=c++14
 
 DEPS       = lspp.hpp format.hpp fileEnt.hpp
 OBJ 			 = lspp.o format.o fileEnt.o
@@ -19,10 +19,16 @@ release: lspp
 lspp.o : lspp.cpp lspp.hpp format.hpp fileEnt.o formatTab.hpp
 		$(CPP) -c -o $@ $< $(CPPFLAGS)
 
+argSet.o : argSet.cpp argSet.hpp
+		$(CPP) -c -o $@ $< $(CPPFLAGS)
+
 fileEnt.o : fileEnt.cpp fileEnt.hpp fileEnt.inl format.hpp
 		$(CPP) -c -o $@ $< $(CPPFLAGS)
 
-lspp: lspp.o fileEnt.o
+printFiles.o : printFiles.cpp printFiles.hpp fileEnt.o
+		$(CPP) -c -o $@ $< $(CPPFLAGS)
+
+lspp: lspp.o fileEnt.o printFiles.o argSet.o
 		$(CPP) -o $@ $^ $(CPPFLAGS) $(LIBS)
 
 clean:
